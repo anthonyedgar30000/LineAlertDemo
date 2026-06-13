@@ -6,6 +6,7 @@ from pathlib import Path
 
 from drift_engine import DriftFinding
 from expert_system import CandidateCause
+from hypothesis_engine import RankedCandidateCause
 from timing_engine import TimingObservations
 from topology_engine import TopologyFinding
 
@@ -15,6 +16,7 @@ def build_report(
     drift_findings: list[DriftFinding],
     topology_findings: list[TopologyFinding],
     candidate_causes: list[CandidateCause],
+    ranked_candidate_causes: list[RankedCandidateCause],
 ) -> str:
     """Create a deterministic, human-readable report."""
 
@@ -34,7 +36,7 @@ def build_report(
     lines.extend(_observations_section(observations))
     lines.extend(_drift_section(drift_findings))
     lines.extend(_topology_section(topology_findings))
-    lines.extend(_candidate_causes_section(candidate_causes))
+    lines.extend(_candidate_causes_section(ranked_candidate_causes))
     lines.extend(_recommended_checks_section(candidate_causes))
 
     return "\n".join(lines).rstrip() + "\n"
@@ -122,19 +124,31 @@ def _topology_section(topology_findings: list[TopologyFinding]) -> list[str]:
     return lines
 
 
-def _candidate_causes_section(candidate_causes: list[CandidateCause]) -> list[str]:
+def _candidate_causes_section(
+    ranked_candidate_causes: list[RankedCandidateCause],
+) -> list[str]:
     lines = [
         "Candidate Causes",
         "----------------",
     ]
 
-    if not candidate_causes:
-        lines.append("- No rules matched current drift evidence.")
+    if not ranked_candidate_causes:
+        lines.append("- No hypotheses scored against current evidence.")
     else:
-        for cause in candidate_causes:
-            lines.append(f"- {cause.issue}")
-            for evidence in cause.matched_evidence:
-                lines.append(f"  Evidence: {evidence}")
+        for cause in ranked_candidate_causes:
+            lines.append(f"{cause.rank}. {cause.name}")
+            lines.append(f"   Confidence: {cause.confidence}")
+            lines.append(f"   Score: {cause.score:.1f} weighted points")
+            if cause.fault_region:
+                lines.append(f"   Fault Region: {cause.fault_region}")
+            lines.append(f"   Observation: {cause.observation_key}")
+            lines.append("   Score Evidence:")
+            for contribution in cause.contributions:
+                lines.append(
+                    f"   - {contribution.evidence_type}: "
+                    f"+{contribution.points:.1f}/{contribution.max_points:.1f} "
+                    f"{contribution.explanation}"
+                )
 
     lines.append("")
     return lines

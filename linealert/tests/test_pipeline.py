@@ -15,6 +15,7 @@ sys.path.insert(0, str(SRC_DIR))
 from drift_engine import calculate_drift, load_baseline  # noqa: E402
 from event_loader import load_events  # noqa: E402
 from expert_system import load_rules, match_rules  # noqa: E402
+from hypothesis_engine import generate_ranked_hypotheses  # noqa: E402
 from main import run_pipeline  # noqa: E402
 from timing_engine import calculate_timing_observations  # noqa: E402
 from topology_engine import identify_first_drift_location, load_topology  # noqa: E402
@@ -30,6 +31,12 @@ class LineAlertPipelineTests(unittest.TestCase):
         candidate_causes = match_rules(drift_findings, rules)
         topology = load_topology(PROJECT_ROOT / "data" / "topology.yaml")
         topology_findings = identify_first_drift_location(topology, drift_findings)
+        ranked_causes = generate_ranked_hypotheses(
+            observations=observations,
+            drift_findings=drift_findings,
+            topology_findings=topology_findings,
+            expert_rules=rules,
+        )
 
         violated_keys = {
             finding.observation_key
@@ -51,6 +58,26 @@ class LineAlertPipelineTests(unittest.TestCase):
             "Delay first appears after TampExtend.",
             topology_findings[0].reason,
         )
+        self.assertEqual(
+            ["Cylinder sticking", "Air pressure issue", "Sensor fault"],
+            [cause.name for cause in ranked_causes],
+        )
+        self.assertEqual(
+            ["High", "Medium", "Low"],
+            [cause.confidence for cause in ranked_causes],
+        )
+        self.assertTrue(
+            all(cause.contributions for cause in ranked_causes)
+        )
+        self.assertEqual(
+            [100.0, 65.0, 35.0],
+            [cause.score for cause in ranked_causes],
+        )
+        for cause in ranked_causes:
+            self.assertEqual(
+                cause.score,
+                sum(contribution.points for contribution in cause.contributions),
+            )
 
     def test_topology_graph_reports_upstream_and_downstream_dependencies(self) -> None:
         topology = load_topology(PROJECT_ROOT / "data" / "topology.yaml")
@@ -81,6 +108,9 @@ class LineAlertPipelineTests(unittest.TestCase):
             self.assertIn("Topology Findings", report)
             self.assertIn("Likely Fault Region: TampExtend subsystem", report)
             self.assertIn("Candidate Causes", report)
+            self.assertIn("1. Cylinder sticking", report)
+            self.assertIn("Confidence: High", report)
+            self.assertIn("rule_match: +30.0/30.0", report)
             self.assertIn("Recommended Checks", report)
 
 

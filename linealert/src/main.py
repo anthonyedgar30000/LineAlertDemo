@@ -8,6 +8,7 @@ from pathlib import Path
 from drift_engine import calculate_drift, load_baseline
 from event_loader import load_events
 from expert_system import load_rules, match_rules
+from hypothesis_engine import generate_ranked_hypotheses
 from report_generator import build_report, write_report
 from timing_engine import calculate_timing_observations
 from topology_engine import identify_first_drift_location, load_topology
@@ -36,12 +37,19 @@ def run_pipeline(
 
     topology = load_topology(topology_path)
     topology_findings = identify_first_drift_location(topology, drift_findings)
+    ranked_candidate_causes = generate_ranked_hypotheses(
+        observations=observations,
+        drift_findings=drift_findings,
+        topology_findings=topology_findings,
+        expert_rules=rules,
+    )
 
     report_text = build_report(
         observations=observations,
         drift_findings=drift_findings,
         topology_findings=topology_findings,
         candidate_causes=candidate_causes,
+        ranked_candidate_causes=ranked_candidate_causes,
     )
     write_report(report_text=report_text, output_path=output_path)
     return report_text

@@ -3,7 +3,8 @@
 LineAlert is an evidence-first industrial troubleshooting system. The MVP reads
 machine event data from CSV files, calculates timing relationships between
 events, compares those observations against a baseline, reasons over machine
-topology, applies deterministic rules, and writes a plain text report.
+topology, applies deterministic rules, ranks candidate explanations, and writes
+a plain text report.
 
 This starter project intentionally excludes:
 
@@ -36,8 +37,12 @@ LineAlert keeps each stage separate:
 5. **Deterministic interpretation** (`expert_system.py`)
    - Load YAML troubleshooting rules
    - Match drift evidence to rule conditions
-   - Produce candidate causes and recommended checks
-6. **Text output** (`report_generator.py`)
+   - Produce rule matches and recommended checks
+6. **Hypothesis ranking** (`hypothesis_engine.py`)
+   - Generate ranked candidate explanations
+   - Apply deterministic, weighted scoring
+   - Explain every awarded score with traceable evidence
+7. **Text output** (`report_generator.py`)
    - Generate a human-readable report with observations, drift findings,
      topology findings, candidate causes, and recommended checks
 
@@ -57,6 +62,7 @@ linealert/
 │   ├── drift_engine.py
 │   ├── topology_engine.py
 │   ├── expert_system.py
+│   ├── hypothesis_engine.py
 │   ├── report_generator.py
 │   └── main.py
 ├── output/
@@ -121,6 +127,37 @@ rules:
           min_drift_seconds: 1.0
     recommendations:
       - "Inspect the TampExtend subsystem for incomplete extension or slow retract clearance."
+    hypotheses:
+      - name: "Cylinder sticking"
+        observation_key: "lag:TampExtend->ProductTransfer"
+        fault_region: "TampExtend subsystem"
+        score_weights:
+          rule_match: 30
+          threshold_violation: 20
+          drift_severity: 20
+          topology_region_match: 20
+          timing_sample_support: 10
+```
+
+The hypothesis engine only awards points when matching evidence exists:
+
+- `rule_match`: the expert rule conditions matched drift evidence
+- `threshold_violation`: the linked drift finding violated its threshold
+- `drift_severity`: drift magnitude relative to the threshold, capped at 1.0
+- `topology_region_match`: topology first-drift region matches the hypothesis
+- `timing_sample_support`: timing metric has repeat observations
+
+Example candidate cause output:
+
+```text
+1. Cylinder sticking
+   Confidence: High
+
+2. Air pressure issue
+   Confidence: Medium
+
+3. Sensor fault
+   Confidence: Low
 ```
 
 ## Run the Sample Pipeline

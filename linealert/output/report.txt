@@ -42,8 +42,37 @@ Topology Findings
 
 Candidate Causes
 ----------------
-- Product transfer is delayed after tamp extension
-  Evidence: lag:TampExtend->ProductTransfer: actual 5.00s, baseline 3.00s, drift +2.00s
+1. Cylinder sticking
+   Confidence: High
+   Score: 100.0 weighted points
+   Fault Region: TampExtend subsystem
+   Observation: lag:TampExtend->ProductTransfer
+   Score Evidence:
+   - rule_match: +30.0/30.0 Expert rule matched: Product transfer is delayed after tamp extension.
+   - threshold_violation: +20.0/20.0 lag:TampExtend->ProductTransfer violated threshold: drift +2.00s, threshold +/-1.00s.
+   - drift_severity: +20.0/20.0 Drift severity ratio is 1.00 based on 2.00s drift over 1.00s threshold.
+   - topology_region_match: +20.0/20.0 Topology first-drift region matches TampExtend subsystem.
+   - timing_sample_support: +10.0/10.0 Timing metric has 3 sample(s); sample support ratio is 1.00.
+2. Air pressure issue
+   Confidence: Medium
+   Score: 65.0 weighted points
+   Fault Region: Pneumatic supply
+   Observation: lag:TampExtend->ProductTransfer
+   Score Evidence:
+   - rule_match: +25.0/25.0 Expert rule matched: Product transfer is delayed after tamp extension.
+   - threshold_violation: +15.0/15.0 lag:TampExtend->ProductTransfer violated threshold: drift +2.00s, threshold +/-1.00s.
+   - drift_severity: +15.0/15.0 Drift severity ratio is 1.00 based on 2.00s drift over 1.00s threshold.
+   - timing_sample_support: +10.0/10.0 Timing metric has 3 sample(s); sample support ratio is 1.00.
+3. Sensor fault
+   Confidence: Low
+   Score: 35.0 weighted points
+   Fault Region: ProductTransfer sensor
+   Observation: lag:TampExtend->ProductTransfer
+   Score Evidence:
+   - rule_match: +15.0/15.0 Expert rule matched: Product transfer is delayed after tamp extension.
+   - threshold_violation: +10.0/10.0 lag:TampExtend->ProductTransfer violated threshold: drift +2.00s, threshold +/-1.00s.
+   - drift_severity: +5.0/5.0 Drift severity ratio is 1.00 based on 2.00s drift over 1.00s threshold.
+   - timing_sample_support: +5.0/5.0 Timing metric has 3 sample(s); sample support ratio is 1.00.
 
 Recommended Checks
 ------------------

@@ -11,6 +11,15 @@ import yaml
 from drift_engine import DriftFinding
 
 
+HYPOTHESIS_SCORE_KEYS = {
+    "rule_match",
+    "threshold_violation",
+    "drift_severity",
+    "topology_region_match",
+    "timing_sample_support",
+}
+
+
 @dataclass(frozen=True)
 class RuleCondition:
     """One deterministic condition in a troubleshooting rule."""
@@ -22,6 +31,16 @@ class RuleCondition:
 
 
 @dataclass(frozen=True)
+class HypothesisTemplate:
+    """A rule-defined candidate explanation and its deterministic weights."""
+
+    name: str
+    observation_key: str
+    fault_region: str
+    score_weights: dict[str, float]
+
+
+@dataclass(frozen=True)
 class TroubleshootingRule:
     """A deterministic rule that maps evidence patterns to checks."""
 
@@ -29,6 +48,7 @@ class TroubleshootingRule:
     all_conditions: list[RuleCondition]
     any_conditions: list[RuleCondition]
     recommendations: list[str]
+    hypotheses: list[HypothesisTemplate]
 
 
 @dataclass(frozen=True)
@@ -54,6 +74,16 @@ def load_rules(rules_path: str | Path) -> list[TroubleshootingRule]:
                   min_drift_seconds: 1.0
             recommendations:
               - "Recommended check"
+            hypotheses:
+              - name: "Candidate explanation"
+                observation_key: "lag:A->B"
+                fault_region: "A subsystem"
+                score_weights:
+                  rule_match: 30
+                  threshold_violation: 20
+                  drift_severity: 20
+                  topology_region_match: 20
+                  timing_sample_support: 10
     """
 
     path = Path(rules_path)
@@ -122,6 +152,10 @@ def _parse_rule(raw_rule: Any, index: int) -> TroubleshootingRule:
     if not isinstance(recommendations, list) or not recommendations:
         raise ValueError(f"Rule {index} requires at least one recommendation")
 
+    raw_hypotheses = raw_rule.get("hypotheses") or []
+    if not isinstance(raw_hypotheses, list):
+        raise ValueError(f"Rule {index} hypotheses must be a list")
+
     return TroubleshootingRule(
         issue=issue,
         all_conditions=[
@@ -133,7 +167,74 @@ def _parse_rule(raw_rule: Any, index: int) -> TroubleshootingRule:
             for condition in raw_conditions.get("any", [])
         ],
         recommendations=[str(recommendation) for recommendation in recommendations],
+        hypotheses=[
+            _parse_hypothesis(hypothesis, index, raw_conditions)
+            for hypothesis in raw_hypotheses
+        ],
     )
+
+
+def _parse_hypothesis(
+    raw_hypothesis: Any,
+    rule_index: int,
+    raw_conditions: dict[str, Any],
+) -> HypothesisTemplate:
+    if not isinstance(raw_hypothesis, dict):
+        raise ValueError(f"Rule {rule_index} hypothesis must be a mapping")
+
+    name = str(raw_hypothesis.get("name", "")).strip()
+    if not name:
+        raise ValueError(f"Rule {rule_index} hypothesis requires a name")
+
+    observation_key = str(raw_hypothesis.get("observation_key", "")).strip()
+    if not observation_key:
+        observation_key = _first_condition_observation_key(raw_conditions)
+    if not observation_key:
+        raise ValueError(
+            f"Rule {rule_index} hypothesis {name!r} requires observation_key"
+        )
+
+    fault_region = str(raw_hypothesis.get("fault_region", "")).strip()
+    score_weights = raw_hypothesis.get("score_weights") or {}
+    if not isinstance(score_weights, dict):
+        raise ValueError(
+            f"Rule {rule_index} hypothesis {name!r} score_weights must be a mapping"
+        )
+
+    parsed_weights: dict[str, float] = {}
+    for key, value in score_weights.items():
+        weight_name = str(key)
+        if weight_name not in HYPOTHESIS_SCORE_KEYS:
+            valid_keys = ", ".join(sorted(HYPOTHESIS_SCORE_KEYS))
+            raise ValueError(
+                f"Rule {rule_index} hypothesis {name!r} has unknown "
+                f"score weight {weight_name!r}. Valid keys: {valid_keys}"
+            )
+        weight_value = float(value)
+        if weight_value < 0:
+            raise ValueError(
+                f"Rule {rule_index} hypothesis {name!r} score weight "
+                f"{weight_name!r} must be >= 0"
+            )
+        parsed_weights[weight_name] = weight_value
+
+    return HypothesisTemplate(
+        name=name,
+        observation_key=observation_key,
+        fault_region=fault_region,
+        score_weights=parsed_weights,
+    )
+
+
+def _first_condition_observation_key(raw_conditions: dict[str, Any]) -> str:
+    for group_name in ("all", "any"):
+        conditions = raw_conditions.get(group_name, [])
+        if not isinstance(conditions, list) or not conditions:
+            continue
+        first_condition = conditions[0]
+        if isinstance(first_condition, dict):
+            return str(first_condition.get("observation_key", "")).strip()
+    return ""
 
 
 def _parse_condition(raw_condition: Any, rule_index: int) -> RuleCondition:
