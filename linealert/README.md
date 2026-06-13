@@ -55,7 +55,8 @@ linealert/
 │   ├── baseline.json
 │   └── topology.yaml
 ├── rules/
-│   └── troubleshooting_rules.yaml
+│   ├── troubleshooting_rules.yaml
+│   └── labeling_guide.yaml
 ├── src/
 │   ├── event_loader.py
 │   ├── timing_engine.py
@@ -138,6 +139,47 @@ rules:
           topology_region_match: 20
           timing_sample_support: 10
 ```
+
+### Labeling Guide Knowledge Base
+
+`rules/labeling_guide.yaml` is a deterministic expert-system knowledge base
+extracted from the provided Labeling Troubleshooting Guide image. It can be
+loaded with the same `expert_system.load_rules()` function as timing rules.
+
+The guide rules capture:
+
+- symptoms
+- visual examples
+- checks
+- actions
+- key points
+- cross-links between related symptoms
+
+Example guide rule:
+
+```yaml
+rules:
+  - id: "label_alignment_off"
+    issue: "Label Alignment is Off"
+    symptom: "Label Alignment is Off"
+    examples:
+      - "Crooked label"
+      - "Rotated label"
+    checks:
+      - "Peel tip square to bottle?"
+      - "Is bottle stable during application?"
+    actions:
+      - "Adjust Peel Angle"
+      - "Adjust Hold Down"
+    cross_links:
+      - symptom_id: "bubbles_on_labels"
+        symptom: "Bubbles on Labels"
+        reason: "Insufficient pressure time or unstable contact can create both bubbles and alignment errors."
+```
+
+Guide-only rules do not contain drift conditions, so they are not automatically
+matched by the timing pipeline. They are intended to power deterministic
+check/action workflows for observed labeling symptoms.
 
 The hypothesis engine only awards points when matching evidence exists:
 

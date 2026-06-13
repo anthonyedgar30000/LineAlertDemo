@@ -310,6 +310,9 @@ def _rule_matches(
     rule: TroubleshootingRule,
     drift_by_key: dict[str, DriftFinding],
 ) -> bool:
+    if not rule.all_conditions and not rule.any_conditions:
+        return False
+
     all_satisfied = (
         all(_condition_matches(condition, drift_by_key) for condition in rule.all_conditions)
         if rule.all_conditions

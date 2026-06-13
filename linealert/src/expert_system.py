@@ -41,10 +41,26 @@ class HypothesisTemplate:
 
 
 @dataclass(frozen=True)
+class RuleCrossLink:
+    """A deterministic relationship from one symptom rule to another."""
+
+    symptom_id: str
+    symptom: str
+    reason: str
+
+
+@dataclass(frozen=True)
 class TroubleshootingRule:
     """A deterministic rule that maps evidence patterns to checks."""
 
+    rule_id: str
     issue: str
+    symptom: str
+    examples: list[str]
+    checks: list[str]
+    actions: list[str]
+    key_point: str
+    cross_links: list[RuleCrossLink]
     all_conditions: list[RuleCondition]
     any_conditions: list[RuleCondition]
     recommendations: list[str]
@@ -74,6 +90,14 @@ def load_rules(rules_path: str | Path) -> list[TroubleshootingRule]:
                   min_drift_seconds: 1.0
             recommendations:
               - "Recommended check"
+            checks:
+              - "Deterministic check from a guide"
+            actions:
+              - "Deterministic action from a guide"
+            cross_links:
+              - symptom_id: "related_symptom"
+                symptom: "Related Symptom"
+                reason: "Why the symptoms are related"
             hypotheses:
               - name: "Candidate explanation"
                 observation_key: "lag:A->B"
@@ -111,6 +135,9 @@ def match_rules(
     candidate_causes: list[CandidateCause] = []
 
     for rule in rules:
+        if not rule.all_conditions and not rule.any_conditions:
+            continue
+
         all_matches = [
             _match_condition(condition, findings_by_key)
             for condition in rule.all_conditions
@@ -148,16 +175,32 @@ def _parse_rule(raw_rule: Any, index: int) -> TroubleshootingRule:
     if not isinstance(raw_conditions, dict):
         raise ValueError(f"Rule {index} conditions must be a mapping")
 
-    recommendations = raw_rule.get("recommendations") or []
+    actions = _parse_string_list(raw_rule.get("actions") or [], f"Rule {index} actions")
+    recommendations = raw_rule.get("recommendations") or actions
     if not isinstance(recommendations, list) or not recommendations:
-        raise ValueError(f"Rule {index} requires at least one recommendation")
+        raise ValueError(
+            f"Rule {index} requires at least one recommendation or action"
+        )
 
     raw_hypotheses = raw_rule.get("hypotheses") or []
     if not isinstance(raw_hypotheses, list):
         raise ValueError(f"Rule {index} hypotheses must be a list")
 
     return TroubleshootingRule(
+        rule_id=str(raw_rule.get("id", "")).strip(),
         issue=issue,
+        symptom=str(raw_rule.get("symptom", issue)).strip(),
+        examples=_parse_string_list(
+            raw_rule.get("examples") or [],
+            f"Rule {index} examples",
+        ),
+        checks=_parse_string_list(
+            raw_rule.get("checks") or [],
+            f"Rule {index} checks",
+        ),
+        actions=actions,
+        key_point=str(raw_rule.get("key_point", "")).strip(),
+        cross_links=_parse_cross_links(raw_rule.get("cross_links") or [], index),
         all_conditions=[
             _parse_condition(condition, index)
             for condition in raw_conditions.get("all", [])
@@ -172,6 +215,43 @@ def _parse_rule(raw_rule: Any, index: int) -> TroubleshootingRule:
             for hypothesis in raw_hypotheses
         ],
     )
+
+
+def _parse_string_list(raw_values: Any, field_name: str) -> list[str]:
+    if not isinstance(raw_values, list):
+        raise ValueError(f"{field_name} must be a list")
+    return [str(value) for value in raw_values]
+
+
+def _parse_cross_links(raw_cross_links: Any, rule_index: int) -> list[RuleCrossLink]:
+    if not isinstance(raw_cross_links, list):
+        raise ValueError(f"Rule {rule_index} cross_links must be a list")
+
+    cross_links: list[RuleCrossLink] = []
+    for link_index, raw_link in enumerate(raw_cross_links, start=1):
+        if not isinstance(raw_link, dict):
+            raise ValueError(
+                f"Rule {rule_index} cross link {link_index} must be a mapping"
+            )
+
+        symptom_id = str(raw_link.get("symptom_id", "")).strip()
+        symptom = str(raw_link.get("symptom", "")).strip()
+        reason = str(raw_link.get("reason", "")).strip()
+        if not symptom_id or not symptom or not reason:
+            raise ValueError(
+                f"Rule {rule_index} cross link {link_index} requires "
+                "symptom_id, symptom, and reason"
+            )
+
+        cross_links.append(
+            RuleCrossLink(
+                symptom_id=symptom_id,
+                symptom=symptom,
+                reason=reason,
+            )
+        )
+
+    return cross_links
 
 
 def _parse_hypothesis(

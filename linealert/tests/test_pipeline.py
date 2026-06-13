@@ -91,6 +91,37 @@ class LineAlertPipelineTests(unittest.TestCase):
             topology.downstream_dependencies("TampExtend"),
         )
 
+    def test_labeling_guide_rules_load_as_deterministic_knowledge_base(self) -> None:
+        guide_rules = load_rules(PROJECT_ROOT / "rules" / "labeling_guide.yaml")
+
+        self.assertEqual(5, len(guide_rules))
+        symptoms = {rule.symptom for rule in guide_rules}
+        self.assertEqual(
+            {
+                "Label Alignment is Off",
+                "Label Has Folds",
+                "Label Has Stretch Lines",
+                "Bubbles on Labels",
+                "Multiple Labels Applying",
+            },
+            symptoms,
+        )
+
+        alignment_rule = next(
+            rule for rule in guide_rules if rule.rule_id == "label_alignment_off"
+        )
+        self.assertIn("Peel tip square to bottle?", alignment_rule.checks)
+        self.assertIn("Adjust Peel Angle", alignment_rule.actions)
+        self.assertEqual(alignment_rule.actions, alignment_rule.recommendations)
+        self.assertEqual("bubbles_on_labels", alignment_rule.cross_links[0].symptom_id)
+
+        events = load_events(PROJECT_ROOT / "data" / "sample_events.csv")
+        observations = calculate_timing_observations(events)
+        baseline = load_baseline(PROJECT_ROOT / "data" / "baseline.json")
+        drift_findings = calculate_drift(observations.metrics, baseline)
+
+        self.assertEqual([], match_rules(drift_findings, guide_rules))
+
     def test_run_pipeline_writes_text_report(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:
             output_path = Path(temp_dir) / "report.txt"

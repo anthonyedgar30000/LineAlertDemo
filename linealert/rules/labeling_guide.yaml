@@ -1,0 +1,132 @@
+# Deterministic knowledge base extracted from the attached Labeling
+# Troubleshooting Guide image. This file contains no AI or machine-learning
+# logic; it is structured expert-system content for checks and actions.
+guide:
+  name: "Labeling Troubleshooting Guide"
+  purpose: "Identify common labeling issues, checks, actions, and related symptoms."
+  source: "User-provided troubleshooting guide image"
+
+rules:
+  - id: "label_alignment_off"
+    issue: "Label Alignment is Off"
+    symptom: "Label Alignment is Off"
+    examples:
+      - "Crooked label"
+      - "Rotated label"
+      - "Inconsistent placement"
+      - "Drifting placement"
+      - "Skewed left/right"
+    checks:
+      - "Peel tip square to bottle?"
+      - "Is bottle stable during application?"
+      - "Are guide rings centered?"
+      - "Is issue constant or intermittent?"
+      - "Does issue worsen at higher speed?"
+    actions:
+      - "Adjust Peel Angle"
+      - "Adjust Hold Down"
+      - "Check Guide Rings"
+      - "Increase Label Delay"
+      - "Reduce Speed Temporarily"
+    key_point: "Alignment problems are usually caused by geometry, stability, or timing offset."
+    cross_links:
+      - symptom_id: "bubbles_on_labels"
+        symptom: "Bubbles on Labels"
+        reason: "Insufficient pressure time or unstable contact can create both bubbles and alignment errors."
+
+  - id: "label_has_folds"
+    issue: "Label Has Folds"
+    symptom: "Label Has Folds"
+    examples:
+      - "Wrinkles"
+      - "Folded edges"
+      - "Label bunching"
+      - "Uneven application"
+    checks:
+      - "Is label speed too high?"
+      - "Is aligner speed too slow?"
+      - "Are folds random or consistent?"
+      - "Does reducing speed help?"
+    actions:
+      - "Decrease Label Speed"
+      - "Increase Aligner Speed"
+      - "Verify Product Stability"
+      - "Reduce Conveyor Speed"
+    key_point: "Folds are usually caused by speed mismatch or poor label setting."
+    cross_links:
+      - symptom_id: "label_has_stretch_lines"
+        symptom: "Label Has Stretch Lines"
+        reason: "Folds and stretch lines can share a speed or tension mismatch."
+
+  - id: "label_has_stretch_lines"
+    issue: "Label Has Stretch Lines"
+    symptom: "Label Has Stretch Lines"
+    examples:
+      - "Stretched label"
+      - "Tension marks"
+      - "Distorted print"
+      - "Label pulling"
+    checks:
+      - "Is label tension too high?"
+      - "Does issue worsen at higher speed?"
+      - "Are feed rollers pulling unevenly?"
+    actions:
+      - "Decrease Label Speed"
+      - "Increase Aligner Speed"
+      - "Inspect Feed Rollers"
+      - "Verify Label Tension"
+    key_point: "Stretch lines are caused by excessive tension or feed speed mismatch."
+    cross_links:
+      - symptom_id: "label_has_folds"
+        symptom: "Label Has Folds"
+        reason: "Stretch lines and folds can share a speed or tension mismatch."
+      - symptom_id: "multiple_labels_applying"
+        symptom: "Multiple Labels Applying"
+        reason: "Feed or tension instability can affect sensor detection and label spacing."
+
+  - id: "bubbles_on_labels"
+    issue: "Bubbles on Labels"
+    symptom: "Bubbles on Labels"
+    examples:
+      - "Trapped air bubbles"
+      - "Incomplete adhesion"
+      - "Lifting label edges"
+    checks:
+      - "Enough pressure time?"
+      - "Is bottle stable?"
+      - "Is contact pressure consistent?"
+      - "Does slowing machine help?"
+    actions:
+      - "Increase Aligner Run-On"
+      - "Increase Bottle Pressure"
+      - "Decrease Label Speed"
+      - "Inspect Contact / Wipe Pressure"
+    key_point: "Bubbles are caused by insufficient pressure time or unstable contact."
+    cross_links:
+      - symptom_id: "label_alignment_off"
+        symptom: "Label Alignment is Off"
+        reason: "Insufficient pressure time or unstable contact can create both bubbles and alignment errors."
+
+  - id: "multiple_labels_applying"
+    issue: "Multiple Labels Applying"
+    symptom: "Multiple Labels Applying"
+    examples:
+      - "Double labels"
+      - "Skipped gaps"
+      - "Overlapping labels"
+    checks:
+      - "Is sensor detecting gaps properly?"
+      - "Is spacing consistent?"
+      - "Is issue intermittent?"
+      - "Does issue occur at specific speeds?"
+    actions:
+      - "Adjust Sensor Sensitivity"
+      - "Reposition Sensor"
+      - "Move Sensor Position"
+      - "Check Label Spacing"
+      - "Inspect Feed Timing"
+    key_point: "Multiple labels are caused by sensor or feed timing issues."
+    cross_links:
+      - symptom_id: "label_has_stretch_lines"
+        symptom: "Label Has Stretch Lines"
+        reason: "Feed or tension instability can affect sensor detection and label spacing."
