@@ -17,6 +17,7 @@ from event_loader import load_events  # noqa: E402
 from expert_system import load_rules, match_rules  # noqa: E402
 from main import run_pipeline  # noqa: E402
 from timing_engine import calculate_timing_observations  # noqa: E402
+from topology_engine import identify_first_drift_location, load_topology  # noqa: E402
 
 
 class LineAlertPipelineTests(unittest.TestCase):
@@ -27,6 +28,8 @@ class LineAlertPipelineTests(unittest.TestCase):
         drift_findings = calculate_drift(observations.metrics, baseline)
         rules = load_rules(PROJECT_ROOT / "rules" / "troubleshooting_rules.yaml")
         candidate_causes = match_rules(drift_findings, rules)
+        topology = load_topology(PROJECT_ROOT / "data" / "topology.yaml")
+        topology_findings = identify_first_drift_location(topology, drift_findings)
 
         violated_keys = {
             finding.observation_key
@@ -35,12 +38,31 @@ class LineAlertPipelineTests(unittest.TestCase):
         }
         issues = {cause.issue for cause in candidate_causes}
 
-        self.assertIn("lag:CycleStart->SensorTriggered", violated_keys)
-        self.assertIn("lag:SensorTriggered->MotorStarted", violated_keys)
-        self.assertIn("cycle:CycleStart", violated_keys)
-        self.assertIn("Sensor response lag is increasing", issues)
-        self.assertIn("Motor start is delayed after sensor trigger", issues)
-        self.assertIn("Overall cycle timing is stretching", issues)
+        self.assertIn("lag:TampExtend->ProductTransfer", violated_keys)
+        self.assertNotIn("lag:PrintComplete->TampRequest", violated_keys)
+        self.assertNotIn("lag:TampRequest->TampExtend", violated_keys)
+        self.assertIn("Product transfer is delayed after tamp extension", issues)
+        self.assertEqual(1, len(topology_findings))
+        self.assertEqual(
+            "TampExtend subsystem",
+            topology_findings[0].likely_fault_region,
+        )
+        self.assertEqual(
+            "Delay first appears after TampExtend.",
+            topology_findings[0].reason,
+        )
+
+    def test_topology_graph_reports_upstream_and_downstream_dependencies(self) -> None:
+        topology = load_topology(PROJECT_ROOT / "data" / "topology.yaml")
+
+        self.assertEqual(
+            ["PrintComplete", "TampRequest"],
+            topology.upstream_dependencies("TampExtend"),
+        )
+        self.assertEqual(
+            ["ProductTransfer"],
+            topology.downstream_dependencies("TampExtend"),
+        )
 
     def test_run_pipeline_writes_text_report(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -49,12 +71,15 @@ class LineAlertPipelineTests(unittest.TestCase):
                 events_path=PROJECT_ROOT / "data" / "sample_events.csv",
                 baseline_path=PROJECT_ROOT / "data" / "baseline.json",
                 rules_path=PROJECT_ROOT / "rules" / "troubleshooting_rules.yaml",
+                topology_path=PROJECT_ROOT / "data" / "topology.yaml",
                 output_path=output_path,
             )
 
             self.assertTrue(output_path.exists())
             self.assertIn("Observations", report)
             self.assertIn("Drift Findings", report)
+            self.assertIn("Topology Findings", report)
+            self.assertIn("Likely Fault Region: TampExtend subsystem", report)
             self.assertIn("Candidate Causes", report)
             self.assertIn("Recommended Checks", report)
 

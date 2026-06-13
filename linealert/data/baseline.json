@@ -1,19 +1,19 @@
 {
-  "description": "Known-good timing baselines for the sample production sequence.",
+  "description": "Known-good timing baselines for the sample Print/Tamp/Transfer sequence.",
   "observations": {
-    "lag:CycleStart->SensorTriggered": {
+    "lag:PrintComplete->TampRequest": {
+      "expected_seconds": 1.0,
+      "threshold_seconds": 0.5
+    },
+    "lag:TampRequest->TampExtend": {
       "expected_seconds": 2.0,
-      "threshold_seconds": 0.75
+      "threshold_seconds": 0.5
     },
-    "lag:SensorTriggered->MotorStarted": {
+    "lag:TampExtend->ProductTransfer": {
       "expected_seconds": 3.0,
-      "threshold_seconds": 0.75
+      "threshold_seconds": 1.0
     },
-    "lag:MotorStarted->CycleEnd": {
-      "expected_seconds": 15.0,
-      "threshold_seconds": 2.0
-    },
-    "cycle:CycleStart": {
+    "cycle:PrintComplete": {
       "expected_seconds": 60.0,
       "threshold_seconds": 3.0
     }

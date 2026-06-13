@@ -7,11 +7,13 @@ from pathlib import Path
 from drift_engine import DriftFinding
 from expert_system import CandidateCause
 from timing_engine import TimingObservations
+from topology_engine import TopologyFinding
 
 
 def build_report(
     observations: TimingObservations,
     drift_findings: list[DriftFinding],
+    topology_findings: list[TopologyFinding],
     candidate_causes: list[CandidateCause],
 ) -> str:
     """Create a deterministic, human-readable report."""
@@ -23,13 +25,15 @@ def build_report(
         "",
         "Architecture",
         "------------",
-        "Evidence is measured first, drift is calculated second, and rules are",
-        "applied last. Recommendations are deterministic checks, not predictions.",
+        "Evidence is measured first, drift is calculated second, and topology",
+        "and rules are applied last. Recommendations are deterministic checks,",
+        "not predictions.",
         "",
     ]
 
     lines.extend(_observations_section(observations))
     lines.extend(_drift_section(drift_findings))
+    lines.extend(_topology_section(topology_findings))
     lines.extend(_candidate_causes_section(candidate_causes))
     lines.extend(_recommended_checks_section(candidate_causes))
 
@@ -90,6 +94,34 @@ def _drift_section(drift_findings: list[DriftFinding]) -> list[str]:
     return lines
 
 
+def _topology_section(topology_findings: list[TopologyFinding]) -> list[str]:
+    lines = [
+        "Topology Findings",
+        "-----------------",
+    ]
+
+    if not topology_findings:
+        lines.append("- No topology edge has threshold-violating drift.")
+    else:
+        for finding in topology_findings:
+            lines.append(f"- Likely Fault Region: {finding.likely_fault_region}")
+            lines.append(f"  Reason: {finding.reason}")
+            lines.append(f"  First Drift Edge: {finding.first_drift_edge}")
+            lines.append(f"  Status: {finding.status}")
+            lines.append(f"  Evidence: {finding.evidence_summary}")
+            lines.append(
+                "  Upstream Dependencies: "
+                f"{_format_dependency_list(finding.upstream_dependencies)}"
+            )
+            lines.append(
+                "  Downstream Dependencies: "
+                f"{_format_dependency_list(finding.downstream_dependencies)}"
+            )
+
+    lines.append("")
+    return lines
+
+
 def _candidate_causes_section(candidate_causes: list[CandidateCause]) -> list[str]:
     lines = [
         "Candidate Causes",
@@ -106,6 +138,12 @@ def _candidate_causes_section(candidate_causes: list[CandidateCause]) -> list[st
 
     lines.append("")
     return lines
+
+
+def _format_dependency_list(dependencies: list[str]) -> str:
+    if not dependencies:
+        return "none"
+    return " -> ".join(dependencies)
 
 
 def _recommended_checks_section(candidate_causes: list[CandidateCause]) -> list[str]:

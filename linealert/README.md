@@ -2,8 +2,8 @@
 
 LineAlert is an evidence-first industrial troubleshooting system. The MVP reads
 machine event data from CSV files, calculates timing relationships between
-events, compares those observations against a baseline, applies deterministic
-rules, and writes a plain text report.
+events, compares those observations against a baseline, reasons over machine
+topology, applies deterministic rules, and writes a plain text report.
 
 This starter project intentionally excludes:
 
@@ -28,13 +28,18 @@ LineAlert keeps each stage separate:
    - Compare timing observations against a JSON baseline
    - Calculate drift values
    - Flag threshold violations
-4. **Deterministic interpretation** (`expert_system.py`)
+4. **Topology reasoning** (`topology_engine.py`)
+   - Load machine dependency relationships from YAML
+   - Build a directed graph
+   - Determine upstream and downstream dependencies
+   - Identify the first dependency edge where drift appears
+5. **Deterministic interpretation** (`expert_system.py`)
    - Load YAML troubleshooting rules
    - Match drift evidence to rule conditions
    - Produce candidate causes and recommended checks
-5. **Text output** (`report_generator.py`)
+6. **Text output** (`report_generator.py`)
    - Generate a human-readable report with observations, drift findings,
-     candidate causes, and recommended checks
+     topology findings, candidate causes, and recommended checks
 
 ## Project Structure
 
@@ -42,13 +47,15 @@ LineAlert keeps each stage separate:
 linealert/
 ├── data/
 │   ├── sample_events.csv
-│   └── baseline.json
+│   ├── baseline.json
+│   └── topology.yaml
 ├── rules/
 │   └── troubleshooting_rules.yaml
 ├── src/
 │   ├── event_loader.py
 │   ├── timing_engine.py
 │   ├── drift_engine.py
+│   ├── topology_engine.py
 │   ├── expert_system.py
 │   ├── report_generator.py
 │   └── main.py
@@ -65,8 +72,8 @@ linealert/
 
 ```csv
 timestamp,event_name
-2026-01-01T00:00:00Z,CycleStart
-2026-01-01T00:00:02Z,SensorTriggered
+2026-01-01T00:00:00Z,PrintComplete
+2026-01-01T00:00:01Z,TampRequest
 ```
 
 ### Baseline JSON
@@ -74,26 +81,46 @@ timestamp,event_name
 ```json
 {
   "observations": {
-    "lag:CycleStart->SensorTriggered": {
-      "expected_seconds": 2.0,
-      "threshold_seconds": 0.75
+    "lag:TampExtend->ProductTransfer": {
+      "expected_seconds": 3.0,
+      "threshold_seconds": 1.0
     }
   }
 }
+```
+
+### Topology YAML
+
+```yaml
+dependencies:
+  - from: "PrintComplete"
+    to: "TampRequest"
+  - from: "TampRequest"
+    to: "TampExtend"
+  - from: "TampExtend"
+    to: "ProductTransfer"
+```
+
+When `PrintComplete -> TampRequest` and `TampRequest -> TampExtend` are normal
+but `TampExtend -> ProductTransfer` is delayed, the topology engine reports:
+
+```text
+Likely Fault Region: TampExtend subsystem
+Reason: Delay first appears after TampExtend.
 ```
 
 ### Rule YAML
 
 ```yaml
 rules:
-  - issue: "Sensor response lag is increasing"
+  - issue: "Product transfer is delayed after tamp extension"
     conditions:
       all:
-        - observation_key: "lag:CycleStart->SensorTriggered"
+        - observation_key: "lag:TampExtend->ProductTransfer"
           direction: "high"
-          min_drift_seconds: 0.75
+          min_drift_seconds: 1.0
     recommendations:
-      - "Inspect sensor alignment, mounting, and target distance."
+      - "Inspect the TampExtend subsystem for incomplete extension or slow retract clearance."
 ```
 
 ## Run the Sample Pipeline

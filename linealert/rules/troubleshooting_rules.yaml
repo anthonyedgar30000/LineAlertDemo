@@ -1,35 +1,13 @@
 # Rules are intentionally deterministic. They match drift evidence by key,
 # direction, and minimum drift before recommending checks.
 rules:
-  - issue: "Sensor response lag is increasing"
+  - issue: "Product transfer is delayed after tamp extension"
     conditions:
       all:
-        - observation_key: "lag:CycleStart->SensorTriggered"
+        - observation_key: "lag:TampExtend->ProductTransfer"
           direction: "high"
-          min_drift_seconds: 0.75
+          min_drift_seconds: 1.0
     recommendations:
-      - "Inspect sensor alignment, mounting, and target distance."
-      - "Check input wiring and terminal tightness for intermittent delay."
-      - "Verify the PLC input filter setting has not changed."
-
-  - issue: "Motor start is delayed after sensor trigger"
-    conditions:
-      all:
-        - observation_key: "lag:SensorTriggered->MotorStarted"
-          direction: "high"
-          min_drift_seconds: 0.75
-    recommendations:
-      - "Check motor starter, contactor, or drive enable response time."
-      - "Review interlock permissives that must clear before motor start."
-      - "Measure command-to-motion delay at the controller and drive."
-
-  - issue: "Overall cycle timing is stretching"
-    conditions:
-      all:
-        - observation_key: "cycle:CycleStart"
-          direction: "high"
-          min_drift_seconds: 3.0
-    recommendations:
-      - "Compare current cycle pacing with the known-good baseline run."
-      - "Inspect shared utilities, mechanical drag, and upstream starvation."
-      - "Confirm no intentional speed reduction or dwell-time change was made."
+      - "Inspect the TampExtend subsystem for incomplete extension or slow retract clearance."
+      - "Check product transfer sensors and mechanical handoff after tamp extension."
+      - "Verify downstream transfer permissives are not delaying release."
