@@ -14,7 +14,12 @@ sys.path.insert(0, str(SRC_DIR))
 
 from drift_engine import calculate_drift, load_baseline  # noqa: E402
 from event_loader import load_events  # noqa: E402
-from expert_system import load_rules, match_rules  # noqa: E402
+from expert_system import (  # noqa: E402
+    format_guide_response,
+    load_rules,
+    match_rules,
+    query_labeling_guide,
+)
 from hypothesis_engine import generate_ranked_hypotheses  # noqa: E402
 from main import run_pipeline  # noqa: E402
 from timing_engine import calculate_timing_observations  # noqa: E402
@@ -113,7 +118,35 @@ class LineAlertPipelineTests(unittest.TestCase):
         self.assertIn("Peel tip square to bottle?", alignment_rule.checks)
         self.assertIn("Adjust Peel Angle", alignment_rule.actions)
         self.assertEqual(alignment_rule.actions, alignment_rule.recommendations)
-        self.assertEqual("bubbles_on_labels", alignment_rule.cross_links[0].symptom_id)
+        self.assertEqual("bubbles_on_labels", alignment_rule.related_issues[0].symptom_id)
+        self.assertIn(
+            "Issue continues after all adjustments.",
+            alignment_rule.escalation_conditions,
+        )
+        self.assertEqual("Peel Angle", alignment_rule.key_adjustment_areas[0].area)
+
+        response = query_labeling_guide(guide_rules, "Label alignment is off")
+        self.assertIsNotNone(response)
+        assert response is not None
+        self.assertEqual("Label Alignment is Off", response.symptom)
+        self.assertIn("Peel tip square to bottle?", response.checks)
+        self.assertIn("Adjust Peel Angle", response.actions)
+        self.assertEqual("Bubbles on Labels", response.related_issues[0].symptom)
+        self.assertIn("Need replacement parts.", response.escalation_conditions)
+
+        interaction = format_guide_response("Label alignment is off", response)
+        self.assertIn('User reports: "Label alignment is off"', interaction)
+        self.assertIn("Relevant Checks:", interaction)
+        self.assertIn("Recommended Actions:", interaction)
+        self.assertIn("Related Symptoms if Problem Persists:", interaction)
+        self.assertIn("Escalation Guidance:", interaction)
+        self.assertIn("Key Adjustment Areas:", interaction)
+        self.assertEqual(
+            interaction,
+            (PROJECT_ROOT / "output" / "sample_labeling_interaction.txt").read_text(
+                encoding="utf-8"
+            ),
+        )
 
         events = load_events(PROJECT_ROOT / "data" / "sample_events.csv")
         observations = calculate_timing_observations(events)

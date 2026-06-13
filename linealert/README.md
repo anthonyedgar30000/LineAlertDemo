@@ -67,7 +67,8 @@ linealert/
 │   ├── report_generator.py
 │   └── main.py
 ├── output/
-│   └── report.txt
+│   ├── report.txt
+│   └── sample_labeling_interaction.txt
 ├── tests/
 ├── requirements.txt
 └── README.md
@@ -153,7 +154,9 @@ The guide rules capture:
 - checks
 - actions
 - key points
-- cross-links between related symptoms
+- related issues
+- escalation conditions
+- key adjustment areas
 
 Example guide rule:
 
@@ -161,25 +164,50 @@ Example guide rule:
 rules:
   - id: "label_alignment_off"
     issue: "Label Alignment is Off"
-    symptom: "Label Alignment is Off"
-    examples:
-      - "Crooked label"
-      - "Rotated label"
+    symptom:
+      name: "Label Alignment is Off"
+      aliases:
+        - "Label alignment off"
+      examples:
+        - "Crooked label"
+        - "Rotated label"
     checks:
       - "Peel tip square to bottle?"
       - "Is bottle stable during application?"
     actions:
       - "Adjust Peel Angle"
       - "Adjust Hold Down"
-    cross_links:
+    related_issues:
       - symptom_id: "bubbles_on_labels"
         symptom: "Bubbles on Labels"
         reason: "Insufficient pressure time or unstable contact can create both bubbles and alignment errors."
+    escalation_conditions:
+      - "Issue continues after all adjustments."
+      - "Need replacement parts."
+    key_adjustment_areas:
+      - area: "Peel Angle"
+        purpose: "Peel plate angle setting"
 ```
 
 Guide-only rules do not contain drift conditions, so they are not automatically
 matched by the timing pipeline. They are intended to power deterministic
 check/action workflows for observed labeling symptoms.
+
+Example deterministic query:
+
+```python
+from expert_system import format_guide_response, load_rules, query_labeling_guide
+
+rules = load_rules("rules/labeling_guide.yaml")
+response = query_labeling_guide(rules, "Label alignment is off")
+print(format_guide_response("Label alignment is off", response))
+```
+
+Sample output is stored at:
+
+```text
+linealert/output/sample_labeling_interaction.txt
+```
 
 The hypothesis engine only awards points when matching evidence exists:
 
