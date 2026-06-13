@@ -68,6 +68,7 @@ linealert/
 │   └── main.py
 ├── output/
 │   ├── report.txt
+│   ├── demo_report.txt
 │   └── sample_labeling_interaction.txt
 ├── tests/
 ├── requirements.txt
@@ -245,6 +246,37 @@ The generated report is written to:
 ```text
 linealert/output/report.txt
 ```
+
+## Run the End-to-End Demo Mode
+
+Demo mode combines guide lookup, timing observations, drift findings, topology
+findings, and ranked hypotheses into one troubleshooting report.
+
+```bash
+cd linealert
+python3 src/main.py --demo --issue "Label Alignment Off"
+```
+
+The generated demo report is written to:
+
+```text
+linealert/output/demo_report.txt
+```
+
+The report contains:
+
+- Issue
+- Observed Evidence
+- Timing Findings
+- Drift Findings
+- Topology Findings
+- Candidate Hypotheses
+- Guide Checks
+- Recommended Actions
+- Escalation Guidance
+- Reasoning Summary
+
+Every recommended action includes the guide evidence that selected it.
 
 ## Run Tests
 

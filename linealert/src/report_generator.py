@@ -5,7 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 
 from drift_engine import DriftFinding
-from expert_system import CandidateCause
+from expert_system import CandidateCause, GuideResponse
 from hypothesis_engine import RankedCandidateCause
 from timing_engine import TimingObservations
 from topology_engine import TopologyFinding
@@ -42,12 +42,304 @@ def build_report(
     return "\n".join(lines).rstrip() + "\n"
 
 
+def build_demo_report(
+    issue: str,
+    guide_response: GuideResponse | None,
+    observations: TimingObservations,
+    drift_findings: list[DriftFinding],
+    topology_findings: list[TopologyFinding],
+    ranked_candidate_causes: list[RankedCandidateCause],
+) -> str:
+    """Create the end-to-end deterministic LineAlert demo report."""
+
+    lines: list[str] = [
+        "=========================",
+        "LINEALERT REPORT",
+        "=========================",
+        "",
+    ]
+
+    lines.extend(_demo_issue_section(issue=issue, guide_response=guide_response))
+    lines.extend(
+        _demo_observed_evidence_section(
+            issue=issue,
+            guide_response=guide_response,
+            observations=observations,
+            drift_findings=drift_findings,
+            topology_findings=topology_findings,
+            ranked_candidate_causes=ranked_candidate_causes,
+        )
+    )
+    lines.extend(_demo_timing_findings_section(observations))
+    lines.extend(_demo_drift_findings_section(drift_findings))
+    lines.extend(_demo_topology_findings_section(topology_findings))
+    lines.extend(_demo_candidate_hypotheses_section(ranked_candidate_causes))
+    lines.extend(_demo_guide_checks_section(guide_response))
+    lines.extend(_demo_recommended_actions_section(guide_response))
+    lines.extend(_demo_escalation_guidance_section(guide_response))
+    lines.extend(
+        _demo_reasoning_summary_section(
+            issue=issue,
+            guide_response=guide_response,
+            drift_findings=drift_findings,
+            topology_findings=topology_findings,
+            ranked_candidate_causes=ranked_candidate_causes,
+        )
+    )
+
+    return "\n".join(lines).rstrip() + "\n"
+
+
 def write_report(report_text: str, output_path: str | Path) -> None:
     """Write the report to a plain text file."""
 
     path = Path(output_path)
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(report_text, encoding="utf-8")
+
+
+def _demo_issue_section(issue: str, guide_response: GuideResponse | None) -> list[str]:
+    matched = guide_response.symptom if guide_response is not None else "none"
+    return [
+        "Issue",
+        "-----",
+        f'Reported issue: "{issue}"',
+        f"Matched guide symptom: {matched}",
+        "",
+    ]
+
+
+def _demo_observed_evidence_section(
+    issue: str,
+    guide_response: GuideResponse | None,
+    observations: TimingObservations,
+    drift_findings: list[DriftFinding],
+    topology_findings: list[TopologyFinding],
+    ranked_candidate_causes: list[RankedCandidateCause],
+) -> list[str]:
+    lines = [
+        "Observed Evidence",
+        "-----------------",
+        f"- User-entered issue text: {issue}",
+    ]
+
+    if guide_response is None:
+        lines.append("- Guide evidence: no symptom matched the user-entered issue.")
+    else:
+        examples = _format_inline_list(guide_response.examples)
+        lines.append(
+            f"- Guide evidence: issue matched symptom "
+            f"{guide_response.symptom!r}; examples include {examples}."
+        )
+
+    lines.append(
+        f"- Timing evidence: {len(observations.metrics)} aggregated metric(s) "
+        f"from {len(observations.lags)} lag observation(s)."
+    )
+    lines.append(
+        f"- Drift evidence: {_count_threshold_violations(drift_findings)} "
+        f"threshold violation(s) across {len(drift_findings)} baseline-matched finding(s)."
+    )
+    lines.append(
+        f"- Topology evidence: {len(topology_findings)} first-drift finding(s)."
+    )
+    lines.append(
+        f"- Hypothesis evidence: {len(ranked_candidate_causes)} ranked candidate(s)."
+    )
+    lines.append("")
+    return lines
+
+
+def _demo_timing_findings_section(observations: TimingObservations) -> list[str]:
+    lines = [
+        "Timing Findings",
+        "---------------",
+    ]
+
+    if not observations.metrics:
+        lines.append("- No timing metrics available.")
+    else:
+        for metric in observations.metrics:
+            lines.append(
+                f"- {metric.observation_key}: {metric.value_seconds:.2f}s "
+                f"average from {metric.sample_count} sample(s)."
+            )
+
+    lines.append("")
+    return lines
+
+
+def _demo_drift_findings_section(drift_findings: list[DriftFinding]) -> list[str]:
+    lines = [
+        "Drift Findings",
+        "--------------",
+    ]
+
+    if not drift_findings:
+        lines.append("- No drift findings available.")
+    else:
+        for finding in drift_findings:
+            status = "VIOLATION" if finding.threshold_violation else "within threshold"
+            lines.append(
+                f"- {finding.observation_key}: actual {finding.actual_seconds:.2f}s, "
+                f"baseline {finding.expected_seconds:.2f}s, "
+                f"drift {finding.drift_seconds:+.2f}s, "
+                f"threshold +/-{finding.threshold_seconds:.2f}s [{status}]."
+            )
+
+    lines.append("")
+    return lines
+
+
+def _demo_topology_findings_section(
+    topology_findings: list[TopologyFinding],
+) -> list[str]:
+    lines = [
+        "Topology Findings",
+        "-----------------",
+    ]
+
+    if not topology_findings:
+        lines.append("- No topology first-drift region identified.")
+    else:
+        for finding in topology_findings:
+            lines.append(
+                f"- Likely fault region: {finding.likely_fault_region}; "
+                f"{finding.reason}"
+            )
+            lines.append(f"  Evidence: {finding.evidence_summary}")
+
+    lines.append("")
+    return lines
+
+
+def _demo_candidate_hypotheses_section(
+    ranked_candidate_causes: list[RankedCandidateCause],
+) -> list[str]:
+    lines = [
+        "Candidate Hypotheses",
+        "--------------------",
+    ]
+
+    if not ranked_candidate_causes:
+        lines.append("- No ranked hypotheses available.")
+    else:
+        for cause in ranked_candidate_causes:
+            lines.append(
+                f"{cause.rank}. {cause.name} "
+                f"(Confidence: {cause.confidence}, Score: {cause.score:.1f})"
+            )
+            lines.append(f"   Evidence: {_hypothesis_evidence_summary(cause)}")
+
+    lines.append("")
+    return lines
+
+
+def _demo_guide_checks_section(guide_response: GuideResponse | None) -> list[str]:
+    lines = [
+        "Guide Checks",
+        "------------",
+    ]
+
+    if guide_response is None:
+        lines.append("- No guide checks available because no symptom matched.")
+    else:
+        evidence = f"matched guide symptom {guide_response.symptom!r}"
+        for check in guide_response.checks:
+            lines.append(f"- {check} (Evidence: {evidence})")
+
+    lines.append("")
+    return lines
+
+
+def _demo_recommended_actions_section(
+    guide_response: GuideResponse | None,
+) -> list[str]:
+    lines = [
+        "Recommended Actions",
+        "-------------------",
+    ]
+
+    if guide_response is None:
+        lines.append("- No actions available. Evidence: no guide symptom matched.")
+    else:
+        guide_evidence = (
+            f"matched guide symptom {guide_response.symptom!r}; "
+            f"relevant checks: {_format_inline_list(guide_response.checks)}"
+        )
+        for action in guide_response.actions:
+            lines.append(f"- {action} (Evidence: {guide_evidence})")
+
+    lines.append("")
+    return lines
+
+
+def _demo_escalation_guidance_section(
+    guide_response: GuideResponse | None,
+) -> list[str]:
+    lines = [
+        "Escalation Guidance",
+        "-------------------",
+    ]
+
+    if guide_response is None:
+        lines.append("- Escalate to manual review. Evidence: no guide symptom matched.")
+    else:
+        guide_evidence = f"guide escalation criteria for {guide_response.symptom!r}"
+        for condition in guide_response.escalation_conditions:
+            lines.append(f"- {condition} (Evidence: {guide_evidence})")
+
+    lines.append("")
+    return lines
+
+
+def _demo_reasoning_summary_section(
+    issue: str,
+    guide_response: GuideResponse | None,
+    drift_findings: list[DriftFinding],
+    topology_findings: list[TopologyFinding],
+    ranked_candidate_causes: list[RankedCandidateCause],
+) -> list[str]:
+    lines = [
+        "Reasoning Summary",
+        "-----------------",
+        "LineAlert used deterministic rule lookup and measured evidence only.",
+    ]
+
+    if guide_response is None:
+        lines.append(f"The reported issue {issue!r} did not match a guide symptom.")
+    else:
+        lines.append(
+            f"The reported issue {issue!r} matched guide symptom "
+            f"{guide_response.symptom!r}, which selected the checks and actions."
+        )
+
+    violation_count = _count_threshold_violations(drift_findings)
+    lines.append(
+        f"Timing and baseline comparison produced {violation_count} "
+        "threshold violation(s)."
+    )
+
+    if topology_findings:
+        first = topology_findings[0]
+        lines.append(
+            f"Topology placed the first drift at {first.first_drift_edge}, "
+            f"supporting {first.likely_fault_region}."
+        )
+    else:
+        lines.append("Topology did not identify a first-drift region.")
+
+    if ranked_candidate_causes:
+        top = ranked_candidate_causes[0]
+        lines.append(
+            f"The top hypothesis is {top.name!r} because its score is backed by: "
+            f"{_hypothesis_evidence_summary(top)}"
+        )
+    else:
+        lines.append("No hypotheses were ranked because no scored evidence matched.")
+
+    lines.append("")
+    return lines
 
 
 def _observations_section(observations: TimingObservations) -> list[str]:
@@ -158,6 +450,26 @@ def _format_dependency_list(dependencies: list[str]) -> str:
     if not dependencies:
         return "none"
     return " -> ".join(dependencies)
+
+
+def _format_inline_list(values: list[str]) -> str:
+    if not values:
+        return "none"
+    return "; ".join(values)
+
+
+def _count_threshold_violations(drift_findings: list[DriftFinding]) -> int:
+    return sum(1 for finding in drift_findings if finding.threshold_violation)
+
+
+def _hypothesis_evidence_summary(candidate: RankedCandidateCause) -> str:
+    if not candidate.contributions:
+        return "no score contributions"
+    return "; ".join(
+        f"{contribution.evidence_type} {contribution.points:.1f}/"
+        f"{contribution.max_points:.1f}"
+        for contribution in candidate.contributions
+    )
 
 
 def _recommended_checks_section(candidate_causes: list[CandidateCause]) -> list[str]:

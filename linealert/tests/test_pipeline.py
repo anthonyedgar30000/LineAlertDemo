@@ -21,7 +21,7 @@ from expert_system import (  # noqa: E402
     query_labeling_guide,
 )
 from hypothesis_engine import generate_ranked_hypotheses  # noqa: E402
-from main import run_pipeline  # noqa: E402
+from main import run_demo, run_pipeline  # noqa: E402
 from timing_engine import calculate_timing_observations  # noqa: E402
 from topology_engine import identify_first_drift_location, load_topology  # noqa: E402
 
@@ -176,6 +176,41 @@ class LineAlertPipelineTests(unittest.TestCase):
             self.assertIn("Confidence: High", report)
             self.assertIn("rule_match: +30.0/30.0", report)
             self.assertIn("Recommended Checks", report)
+
+    def test_run_demo_generates_end_to_end_report(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            output_path = Path(temp_dir) / "demo_report.txt"
+            report = run_demo(
+                issue="Label Alignment Off",
+                events_path=PROJECT_ROOT / "data" / "sample_events.csv",
+                baseline_path=PROJECT_ROOT / "data" / "baseline.json",
+                rules_path=PROJECT_ROOT / "rules" / "troubleshooting_rules.yaml",
+                guide_rules_path=PROJECT_ROOT / "rules" / "labeling_guide.yaml",
+                topology_path=PROJECT_ROOT / "data" / "topology.yaml",
+                output_path=output_path,
+            )
+
+            self.assertTrue(output_path.exists())
+            self.assertIn("=========================\nLINEALERT REPORT", report)
+            for heading in [
+                "Issue",
+                "Observed Evidence",
+                "Timing Findings",
+                "Drift Findings",
+                "Topology Findings",
+                "Candidate Hypotheses",
+                "Guide Checks",
+                "Recommended Actions",
+                "Escalation Guidance",
+                "Reasoning Summary",
+            ]:
+                self.assertIn(heading, report)
+
+            self.assertIn('Reported issue: "Label Alignment Off"', report)
+            self.assertIn("Matched guide symptom: Label Alignment is Off", report)
+            self.assertIn("1. Cylinder sticking", report)
+            self.assertIn("- Adjust Peel Angle (Evidence:", report)
+            self.assertIn("Timing and baseline comparison produced 1", report)
 
 
 if __name__ == "__main__":
