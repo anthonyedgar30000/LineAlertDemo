@@ -1,0 +1,51 @@
+LineAlert Troubleshooting Report
+=================================
+Generated UTC: 2026-06-13T20:54:39+00:00
+
+Architecture
+------------
+Evidence is measured first, drift is calculated second, and rules are
+applied last. Recommendations are deterministic checks, not predictions.
+
+Observations
+------------
+Adjacent event lags measured: 11
+Repeated-event cycles measured: 8
+
+Aggregated timing metrics:
+- cycle:CycleEnd: 67.00s average from 2 sample(s)
+- cycle:CycleStart: 63.50s average from 2 sample(s)
+- cycle:MotorStarted: 65.50s average from 2 sample(s)
+- cycle:SensorTriggered: 64.50s average from 2 sample(s)
+- lag:CycleEnd->CycleStart: 42.00s average from 2 sample(s)
+- lag:CycleStart->SensorTriggered: 3.00s average from 3 sample(s)
+- lag:MotorStarted->CycleEnd: 16.33s average from 3 sample(s)
+- lag:SensorTriggered->MotorStarted: 4.00s average from 3 sample(s)
+
+Drift Findings
+--------------
+- cycle:CycleStart: actual 63.50s, baseline 60.00s, drift +3.50s (+5.8%), threshold +/-3.00s [VIOLATION]
+- lag:CycleStart->SensorTriggered: actual 3.00s, baseline 2.00s, drift +1.00s (+50.0%), threshold +/-0.75s [VIOLATION]
+- lag:MotorStarted->CycleEnd: actual 16.33s, baseline 15.00s, drift +1.33s (+8.9%), threshold +/-2.00s [within threshold]
+- lag:SensorTriggered->MotorStarted: actual 4.00s, baseline 3.00s, drift +1.00s (+33.3%), threshold +/-0.75s [VIOLATION]
+
+Candidate Causes
+----------------
+- Sensor response lag is increasing
+  Evidence: lag:CycleStart->SensorTriggered: actual 3.00s, baseline 2.00s, drift +1.00s
+- Motor start is delayed after sensor trigger
+  Evidence: lag:SensorTriggered->MotorStarted: actual 4.00s, baseline 3.00s, drift +1.00s
+- Overall cycle timing is stretching
+  Evidence: cycle:CycleStart: actual 63.50s, baseline 60.00s, drift +3.50s
+
+Recommended Checks
+------------------
+- Inspect sensor alignment, mounting, and target distance.
+- Check input wiring and terminal tightness for intermittent delay.
+- Verify the PLC input filter setting has not changed.
+- Check motor starter, contactor, or drive enable response time.
+- Review interlock permissives that must clear before motor start.
+- Measure command-to-motion delay at the controller and drive.
+- Compare current cycle pacing with the known-good baseline run.
+- Inspect shared utilities, mechanical drag, and upstream starvation.
+- Confirm no intentional speed reduction or dwell-time change was made.

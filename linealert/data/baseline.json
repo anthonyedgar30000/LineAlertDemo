@@ -1,0 +1,21 @@
+{
+  "description": "Known-good timing baselines for the sample production sequence.",
+  "observations": {
+    "lag:CycleStart->SensorTriggered": {
+      "expected_seconds": 2.0,
+      "threshold_seconds": 0.75
+    },
+    "lag:SensorTriggered->MotorStarted": {
+      "expected_seconds": 3.0,
+      "threshold_seconds": 0.75
+    },
+    "lag:MotorStarted->CycleEnd": {
+      "expected_seconds": 15.0,
+      "threshold_seconds": 2.0
+    },
+    "cycle:CycleStart": {
+      "expected_seconds": 60.0,
+      "threshold_seconds": 3.0
+    }
+  }
+}
