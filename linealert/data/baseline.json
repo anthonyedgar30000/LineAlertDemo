@@ -1,0 +1,21 @@
+{
+  "description": "Known-good timing baselines for the sample Print/Tamp/Transfer sequence.",
+  "observations": {
+    "lag:PrintComplete->TampRequest": {
+      "expected_seconds": 1.0,
+      "threshold_seconds": 0.5
+    },
+    "lag:TampRequest->TampExtend": {
+      "expected_seconds": 2.0,
+      "threshold_seconds": 0.5
+    },
+    "lag:TampExtend->ProductTransfer": {
+      "expected_seconds": 3.0,
+      "threshold_seconds": 1.0
+    },
+    "cycle:PrintComplete": {
+      "expected_seconds": 60.0,
+      "threshold_seconds": 3.0
+    }
+  }
+}

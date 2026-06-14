@@ -1,0 +1,43 @@
+# Rules are intentionally deterministic. They match drift evidence by key,
+# direction, and minimum drift before recommending checks.
+rules:
+  - issue: "Product transfer is delayed after tamp extension"
+    conditions:
+      all:
+        - observation_key: "lag:TampExtend->ProductTransfer"
+          direction: "high"
+          min_drift_seconds: 1.0
+    recommendations:
+      - "Inspect the TampExtend subsystem for incomplete extension or slow retract clearance."
+      - "Check product transfer sensors and mechanical handoff after tamp extension."
+      - "Verify downstream transfer permissives are not delaying release."
+    hypotheses:
+      - name: "Cylinder sticking"
+        observation_key: "lag:TampExtend->ProductTransfer"
+        fault_region: "TampExtend subsystem"
+        score_weights:
+          rule_match: 30
+          threshold_violation: 20
+          drift_severity: 20
+          topology_region_match: 20
+          timing_sample_support: 10
+
+      - name: "Air pressure issue"
+        observation_key: "lag:TampExtend->ProductTransfer"
+        fault_region: "Pneumatic supply"
+        score_weights:
+          rule_match: 25
+          threshold_violation: 15
+          drift_severity: 15
+          topology_region_match: 0
+          timing_sample_support: 10
+
+      - name: "Sensor fault"
+        observation_key: "lag:TampExtend->ProductTransfer"
+        fault_region: "ProductTransfer sensor"
+        score_weights:
+          rule_match: 15
+          threshold_violation: 10
+          drift_severity: 5
+          topology_region_match: 0
+          timing_sample_support: 5

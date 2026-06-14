@@ -1,0 +1,9 @@
+# Machine dependency topology for deterministic fault-region reasoning.
+# Each edge means the downstream event depends on completion/request from upstream.
+dependencies:
+  - from: "PrintComplete"
+    to: "TampRequest"
+  - from: "TampRequest"
+    to: "TampExtend"
+  - from: "TampExtend"
+    to: "ProductTransfer"
