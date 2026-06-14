@@ -24,10 +24,17 @@ def build_demo_alerts(issue: str) -> list[AlertLine]:
 
     if issue.casefold() == DEFAULT_ISSUE.casefold():
         return [
-            AlertLine("Line", "Northbound platform"),
-            AlertLine("Status", "Boarding delay"),
-            AlertLine("Next update", "03:55 UTC"),
-            AlertLine("Passenger guidance", "Use the center display for reroutes"),
+            AlertLine("Issue", "Label Alignment Off"),
+            AlertLine("Asset", "Label Applicator Station"),
+            AlertLine("Observed Condition", "Label placement drift detected"),
+            AlertLine("Expected State", "Label applied within alignment tolerance"),
+            AlertLine("Observed State", "Label position outside expected tolerance window"),
+            AlertLine("Likely Layer", "Mechanical alignment / sensor timing"),
+            AlertLine(
+                "Recommended Action",
+                "Inspect label guide, tamp alignment, and sensor timing before rebaseline",
+            ),
+            AlertLine("Escalation", "Operator Lead if repeated after adjustment"),
         ]
 
     return [
@@ -65,7 +72,7 @@ class LineAlertApplication:
     def execute(self, context_request: ContextRequest) -> str:
         return render_alerts(
             build_demo_alerts(context_request.user_intent),
-            title=context_request.user_intent,
+            title="LineAlert Report",
         )
 
 

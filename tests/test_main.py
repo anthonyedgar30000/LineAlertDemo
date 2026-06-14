@@ -12,6 +12,14 @@ from contextos import ContextRequest, ContextRouter
 from main import build_application_registry, main, run_contextos_request
 
 
+FORBIDDEN_DEMO_TERMS = (
+    "Northbound platform",
+    "Boarding delay",
+    "Passenger guidance",
+    "center display",
+)
+
+
 class RenderAlertsTests(unittest.TestCase):
     def test_labels_share_the_same_separator_column(self) -> None:
         output = render_alerts(
@@ -30,11 +38,38 @@ class RenderAlertsTests(unittest.TestCase):
     def test_label_alignment_issue_demo_contains_expected_rows(self) -> None:
         output = render_alerts(
             build_demo_alerts("Label Alignment Off"),
-            title="Label Alignment Off",
+            title="LineAlert Report",
         )
 
-        self.assertIn("Label Alignment Off", output)
-        self.assertIn("Passenger guidance : Use the center display for reroutes", output)
+        self.assertIn("LineAlert Report", output)
+        self.assertIn("Issue              : Label Alignment Off", output)
+        self.assertIn("Asset              : Label Applicator Station", output)
+        self.assertIn(
+            "Observed Condition : Label placement drift detected",
+            output,
+        )
+        self.assertIn(
+            "Expected State     : Label applied within alignment tolerance",
+            output,
+        )
+        self.assertIn(
+            "Observed State     : Label position outside expected tolerance window",
+            output,
+        )
+        self.assertIn(
+            "Likely Layer       : Mechanical alignment / sensor timing",
+            output,
+        )
+        self.assertIn(
+            "Recommended Action : Inspect label guide, tamp alignment, and sensor timing before rebaseline",
+            output,
+        )
+        self.assertIn(
+            "Escalation         : Operator Lead if repeated after adjustment",
+            output,
+        )
+        for term in FORBIDDEN_DEMO_TERMS:
+            self.assertNotIn(term, output)
 
     def test_contextos_request_wraps_line_alert_output(self) -> None:
         output = run_contextos_request("Label Alignment Off", request_id="test-request")
@@ -49,7 +84,13 @@ class RenderAlertsTests(unittest.TestCase):
         self.assertIn("decision", output)
         self.assertIn("Proceed", output)
         self.assertIn("Application Output:", output)
-        self.assertIn("Passenger guidance : Use the center display for reroutes", output)
+        self.assertIn("LineAlert Report", output)
+        self.assertIn(
+            "Recommended Action : Inspect label guide, tamp alignment, and sensor timing before rebaseline",
+            output,
+        )
+        for term in FORBIDDEN_DEMO_TERMS:
+            self.assertNotIn(term, output)
 
     def test_line_alert_is_registered_application(self) -> None:
         registry = build_application_registry()
@@ -71,9 +112,11 @@ class RenderAlertsTests(unittest.TestCase):
         self.assertEqual(response.confidence, "Medium-high")
         self.assertIsNotNone(response.application_output)
         self.assertIn(
-            "Passenger guidance : Use the center display for reroutes",
+            "Recommended Action : Inspect label guide, tamp alignment, and sensor timing before rebaseline",
             response.application_output,
         )
+        for term in FORBIDDEN_DEMO_TERMS:
+            self.assertNotIn(term, response.application_output)
 
     def test_unknown_issue_policy_skips_line_alert_invocation(self) -> None:
         output = run_contextos_request("Unexpected Platform Fire", request_id="test-request")
@@ -104,6 +147,8 @@ class RenderAlertsTests(unittest.TestCase):
         self.assertIn("ContextOS Governed Response", output)
         self.assertIn("ContextOS Envelope:", output)
         self.assertIn("Application Output:", output)
+        for term in FORBIDDEN_DEMO_TERMS:
+            self.assertNotIn(term, output)
 
 
 if __name__ == "__main__":
