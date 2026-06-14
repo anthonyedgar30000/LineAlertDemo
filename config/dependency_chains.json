@@ -1,0 +1,12 @@
+{
+  "chains": [
+    [
+      "ProductDetected",
+      "PrintComplete",
+      "TampExtendCommand",
+      "TampExtendedSensor",
+      "TampHomeSensor",
+      "CycleComplete"
+    ]
+  ]
+}
