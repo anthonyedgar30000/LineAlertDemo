@@ -141,3 +141,16 @@ The following are failure conditions:
 
 When a failure condition is detected, stop and request clarification or provide
 alternative hypotheses.
+
+## 10. Contradiction Check
+
+Before finalizing:
+
+1. Identify statements that could conflict.
+2. Identify assumptions that support each statement.
+3. Report unresolved contradictions.
+
+If contradictions remain:
+
+- Lower confidence.
+- Recommend investigation.
