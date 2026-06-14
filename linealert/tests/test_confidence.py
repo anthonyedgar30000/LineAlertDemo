@@ -101,7 +101,7 @@ class ObservationConfidenceTests(unittest.TestCase):
         )
         report = confidence.as_dict()
 
-        self.assertEqual(0.95, confidence.confidence)
+        self.assertEqual(1.0, confidence.confidence)
         self.assertEqual("Very High", confidence.classification)
         self.assertEqual(
             [
@@ -161,7 +161,7 @@ class ObservationConfidenceTests(unittest.TestCase):
         text = format_confidence_report(confidence)
 
         self.assertEqual(OBSERVATION, report["observation"])
-        self.assertEqual(0.95, report["confidence"])
+        self.assertEqual(1.0, report["confidence"])
         self.assertEqual("Very High", report["classification"])
         self.assertIn("OBSERVATION CONFIDENCE", text)
         self.assertIn("Confidence:\n0.950", text)

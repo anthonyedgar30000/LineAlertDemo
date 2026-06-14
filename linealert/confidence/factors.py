@@ -13,7 +13,7 @@ def supporting_evidence_factor(evidence_count: int, cluster_count: int) -> Confi
             f"{evidence_count} supporting evidence item(s) across "
             f"{cluster_count} observation cluster(s)"
         ),
-        contribution=contribution,
+        contribution=round(contribution, 3),
     )
 
 
@@ -33,7 +33,7 @@ def historical_persistence_factor(
             f"{persistence_cycles} consecutive cycle(s); "
             f"{recurrence_count} recurrence observation(s)"
         ),
-        contribution=contribution,
+        contribution=round(contribution, 3),
     )
 
 
@@ -42,7 +42,7 @@ def multi_source_confirmation_factor(sources_contributing: int) -> ConfidenceFac
     return ConfidenceFactor(
         name="Multi-Source Confirmation",
         description=f"{sources_contributing} supporting evidence source(s)",
-        contribution=contribution,
+        contribution=round(contribution, 3),
     )
 
 
@@ -66,7 +66,7 @@ def topology_validation_factor(
             f"RelationshipIntegrity={relationship_integrity_status}; "
             f"DependencyChains={dependency_chain_status}"
         ),
-        contribution=contribution,
+        contribution=round(contribution, 3),
     )
 
 
@@ -89,5 +89,5 @@ def configuration_validity_factor(
             f"ConfigurationProvenance={configuration_provenance_status}; "
             f"ConfigurationDriftPresent={configuration_drift_present}"
         ),
-        contribution=contribution,
+        contribution=round(contribution, 3),
     )
