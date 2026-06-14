@@ -15,6 +15,7 @@ from applications.linealert import (
 )
 from contextos import ContextRequest, ContextRouter
 from main import build_application_registry, main, run_contextos_request
+from troubleshooting import TroubleshootingEngine
 
 
 FORBIDDEN_DEMO_TERMS = (
@@ -92,6 +93,21 @@ class RenderAlertsTests(unittest.TestCase):
         self.assertIn("2. Tamp pad wear", output)
         self.assertIn("3. Product positioning variance", output)
         self.assertIn("4. Sensor contamination", output)
+        self.assertIn("Peter Troubleshooting Guide", output)
+        self.assertIn("Guide: Peter Label Alignment Guide", output)
+        self.assertIn("Prioritized Workflow", output)
+        self.assertIn("Troubleshooting Workflow", output)
+        self.assertIn("Current Recommended Starting Step:", output)
+        self.assertIn("Inspect Label Guide", output)
+        self.assertIn("Highest ranked hypothesis:", output)
+        self.assertIn("Label guide loosened", output)
+        self.assertIn("Supporting Evidence:", output)
+        self.assertIn("- Expected lag 100 ms", output)
+        self.assertIn("- Observed lag 153 ms", output)
+        self.assertIn("- Drift +53 ms", output)
+        self.assertIn("Verification Steps", output)
+        self.assertIn("Run 10 bottles and confirm alignment within tolerance", output)
+        self.assertIn("Confirm alignment restored", output)
         self.assertIn("Recommended Actions", output)
         self.assertIn("Escalation Guidance", output)
         self.assertIn("Confidence Assessment", output)
@@ -102,6 +118,25 @@ class RenderAlertsTests(unittest.TestCase):
             self.assertIn(relationship, output)
         for term in FORBIDDEN_DEMO_TERMS:
             self.assertNotIn(term, output)
+
+    def test_troubleshooting_engine_ranks_peter_guide_from_hypotheses(self) -> None:
+        engine = TroubleshootingEngine()
+        guide = engine.load_guide("Label Alignment Off")
+        ranked_steps = engine.rank_steps_from_evidence(
+            guide,
+            (
+                "Label guide loosened",
+                "Tamp pad wear",
+                "Product positioning variance",
+                "Sensor contamination",
+            ),
+        )
+
+        self.assertEqual(guide.guide_name, "Peter Label Alignment Guide")
+        self.assertEqual(ranked_steps[0].title, "Inspect Label Guide")
+        self.assertEqual(ranked_steps[1].title, "Inspect Tamp Pad")
+        self.assertEqual(ranked_steps[2].title, "Verify Product Stop Position")
+        self.assertEqual(ranked_steps[3].title, "Inspect Sensors")
 
     def test_contextos_request_wraps_line_alert_output(self) -> None:
         output = run_contextos_request("Label Alignment Off", request_id="test-request")
@@ -119,6 +154,8 @@ class RenderAlertsTests(unittest.TestCase):
         self.assertIn("Machine Context", output)
         self.assertIn("LineAlert Investigation Package", output)
         self.assertIn("- Delta: +53 ms", output)
+        self.assertIn("Peter Troubleshooting Guide", output)
+        self.assertIn("Current Recommended Starting Step:", output)
         self.assertIn(
             "1. Inspect and secure the label guide before changing timing parameters.",
             output,

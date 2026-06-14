@@ -6,12 +6,31 @@ from dataclasses import dataclass
 from typing import Sequence
 
 from contextos import ApplicationRegistry, ContextRequest
+from troubleshooting import TroubleshootingEngine
 
 
 DEFAULT_ISSUE = "Label Alignment Off"
 MACHINE_NAME = "Bottle Labeling Machine"
 BASE_TIMESTAMP = "2026-06-14T05:16:00"
 EXPECTED_TAMP_TO_APPLIED_MS = 100
+CANDIDATE_HYPOTHESES = (
+    (
+        "Label guide loosened",
+        "highest ranked possibility; could shift label path before tamp contact.",
+    ),
+    (
+        "Tamp pad wear",
+        "could reduce consistent label transfer and add application delay.",
+    ),
+    (
+        "Product positioning variance",
+        "could change bottle presentation during tamp extension.",
+    ),
+    (
+        "Sensor contamination",
+        "could delay readiness or applied-state confirmation.",
+    ),
+)
 
 
 @dataclass(frozen=True)
@@ -154,6 +173,16 @@ def render_linealert_report(issue: str) -> str:
     events = build_demo_cycle()
     timing = calculate_timing_analysis(events)
     drift_classification = classify_drift(timing.delta_ms)
+    hypothesis_titles = tuple(hypothesis for hypothesis, _ in CANDIDATE_HYPOTHESES)
+    troubleshooting_workflow = TroubleshootingEngine().generate_workflow(
+        issue_name=issue,
+        candidate_hypotheses=hypothesis_titles,
+        supporting_evidence=(
+            f"Expected lag {timing.expected_lag_ms} ms",
+            f"Observed lag {timing.observed_lag_ms} ms",
+            f"Drift +{timing.delta_ms} ms",
+        ),
+    )
 
     rendered_rows = [
         render_machine_context(),
@@ -204,10 +233,16 @@ def render_linealert_report(issue: str) -> str:
             "- Severe Drift: >75 ms delta",
             "",
             "Candidate Hypotheses",
-            "1. Label guide loosened - highest ranked possibility; could shift label path before tamp contact.",
-            "2. Tamp pad wear - could reduce consistent label transfer and add application delay.",
-            "3. Product positioning variance - could change bottle presentation during tamp extension.",
-            "4. Sensor contamination - could delay readiness or applied-state confirmation.",
+        ]
+    )
+    rendered_rows.extend(
+        f"{index}. {hypothesis} - {detail}"
+        for index, (hypothesis, detail) in enumerate(CANDIDATE_HYPOTHESES, start=1)
+    )
+    rendered_rows.extend(
+        [
+            "",
+            troubleshooting_workflow,
             "",
             "Recommended Actions",
             "1. Inspect and secure the label guide before changing timing parameters.",
