@@ -3,7 +3,18 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Sequence
+from pathlib import Path
+from typing import Any, Sequence
+
+import yaml
+
+
+DEFAULT_PETER_GUIDE_PATH = (
+    Path(__file__).resolve().parents[1]
+    / "linealert"
+    / "rules"
+    / "peter_label_alignment_guide.yaml"
+)
 
 
 @dataclass(frozen=True)
@@ -16,6 +27,7 @@ class TroubleshootingStep:
     pass_action: str
     fail_action: str
     verification_action: str
+    ranking_keywords: tuple[str, ...]
 
 
 @dataclass(frozen=True)
@@ -29,7 +41,9 @@ class TroubleshootingEngine:
     """Ranks guide steps from observed evidence and candidate hypotheses."""
 
     def __init__(self, guides: Sequence[TroubleshootingGuide] | None = None) -> None:
-        configured_guides = tuple(guides) if guides is not None else (build_peter_label_alignment_guide(),)
+        configured_guides = (
+            tuple(guides) if guides is not None else (load_peter_label_alignment_guide(),)
+        )
         self._guides_by_issue = {
             self._normalize(guide.issue_name): guide for guide in configured_guides
         }
@@ -149,73 +163,109 @@ class TroubleshootingEngine:
 
     @staticmethod
     def _ranking_keywords(step: TroubleshootingStep) -> tuple[str, ...]:
-        if step.step_id == "1":
-            return ("guide",)
-        if step.step_id == "2":
-            return ("tamp",)
-        if step.step_id == "3":
-            return ("positioning",)
-        if step.step_id == "4":
-            return ("sensor",)
-        return ()
+        return step.ranking_keywords
 
     @staticmethod
     def _normalize(value: str) -> str:
         return value.casefold()
 
 
+def load_peter_label_alignment_guide() -> TroubleshootingGuide:
+    """Load the active Peter Label Alignment Guide from external YAML data."""
+
+    return load_troubleshooting_guide(DEFAULT_PETER_GUIDE_PATH)
+
+
+def load_troubleshooting_guide(guide_path: str | Path) -> TroubleshootingGuide:
+    path = Path(guide_path)
+    with path.open("r", encoding="utf-8") as guide_file:
+        raw_data = yaml.safe_load(guide_file) or {}
+    return _parse_troubleshooting_guide(raw_data, path)
+
+
 def build_peter_label_alignment_guide() -> TroubleshootingGuide:
+    """Backward-compatible loader for the Peter Label Alignment Guide."""
+
+    return load_peter_label_alignment_guide()
+
+
+def _parse_troubleshooting_guide(
+    raw_data: dict[str, Any],
+    guide_path: Path,
+) -> TroubleshootingGuide:
+    guide = raw_data.get("guide")
+    if not isinstance(guide, dict):
+        raise ValueError(f"Guide YAML must contain a 'guide' mapping: {guide_path}")
+
+    steps = guide.get("ordered_steps")
+    if not isinstance(steps, list) or not steps:
+        raise ValueError(
+            f"Guide YAML must contain a non-empty 'ordered_steps' list: {guide_path}"
+        )
+
     return TroubleshootingGuide(
-        guide_name="Peter Label Alignment Guide",
-        issue_name="Label Alignment Off",
-        ordered_steps=(
-            TroubleshootingStep(
-                step_id="1",
-                title="Inspect Label Guide",
-                description="Check the label guide for looseness or misalignment.",
-                expected_failure_modes=("Label guide loosened", "Guide misalignment"),
-                expected_components=("Label Feed Assembly", "Label Guide"),
-                pass_action="Continue to tamp pad inspection if alignment drift persists.",
-                fail_action="Secure and realign the label guide before rebaseline.",
-                verification_action="Run 10 bottles and confirm alignment within tolerance",
-            ),
-            TroubleshootingStep(
-                step_id="2",
-                title="Inspect Tamp Pad",
-                description="Check tamp pad condition and label transfer consistency.",
-                expected_failure_modes=("Tamp pad wear", "Poor label transfer"),
-                expected_components=("Tamp Cylinder", "Tamp Pad"),
-                pass_action="Continue to product stop position verification.",
-                fail_action="Clean or replace tamp pad before rebaseline.",
-                verification_action="Observe consistent label transfer",
-            ),
-            TroubleshootingStep(
-                step_id="3",
-                title="Verify Product Stop Position",
-                description="Check bottle presentation and stop repeatability.",
-                expected_failure_modes=(
-                    "Product positioning variance",
-                    "Conveyor instability",
-                ),
-                expected_components=("Conveyor", "Product Detect Sensor"),
-                pass_action="Continue to sensor inspection.",
-                fail_action="Stabilize bottle stop position before rebaseline.",
-                verification_action="Measure bottle stop repeatability",
-            ),
-            TroubleshootingStep(
-                step_id="4",
-                title="Inspect Sensors",
-                description="Check readiness and applied-state sensor transitions.",
-                expected_failure_modes=(
-                    "Label ready sensor contamination",
-                    "Applied sensor contamination",
-                ),
-                expected_components=("Label Ready Sensor", "Label Applied Sensor"),
-                pass_action="Document results and monitor next production run.",
-                fail_action="Clean and validate sensors before rebaseline.",
-                verification_action=(
-                    "Sensor transitions occur within expected timing window"
-                ),
-            ),
+        guide_name=_required_string(guide, "name", guide_path),
+        issue_name=_required_string(guide, "issue", guide_path),
+        ordered_steps=tuple(_parse_step(step, guide_path) for step in steps),
+    )
+
+
+def _parse_step(raw_step: Any, guide_path: Path) -> TroubleshootingStep:
+    if not isinstance(raw_step, dict):
+        raise ValueError(f"Guide step must be a mapping: {guide_path}")
+
+    actions = raw_step.get("actions")
+    if not isinstance(actions, dict):
+        raise ValueError(f"Guide step must contain an 'actions' mapping: {guide_path}")
+
+    return TroubleshootingStep(
+        step_id=_required_string(raw_step, "id", guide_path),
+        title=_required_string(raw_step, "title", guide_path),
+        description=_required_string(raw_step, "description", guide_path),
+        expected_failure_modes=_required_string_tuple(
+            raw_step,
+            "failure_modes",
+            guide_path,
+        ),
+        expected_components=_required_string_tuple(
+            raw_step,
+            "related_components",
+            guide_path,
+        ),
+        pass_action=_required_string(actions, "pass", guide_path),
+        fail_action=_required_string(actions, "fail", guide_path),
+        verification_action=_required_string(actions, "verification", guide_path),
+        ranking_keywords=_required_string_tuple(
+            raw_step,
+            "ranking_keywords",
+            guide_path,
         ),
     )
+
+
+def _required_string(
+    mapping: dict[str, Any],
+    key: str,
+    guide_path: Path,
+) -> str:
+    value = mapping.get(key)
+    if not isinstance(value, str) or not value:
+        raise ValueError(f"Guide field '{key}' must be a non-empty string: {guide_path}")
+    return value
+
+
+def _required_string_tuple(
+    mapping: dict[str, Any],
+    key: str,
+    guide_path: Path,
+) -> tuple[str, ...]:
+    values = mapping.get(key)
+    if not isinstance(values, list) or not values:
+        raise ValueError(
+            f"Guide field '{key}' must be a non-empty string list: {guide_path}"
+        )
+    if not all(isinstance(value, str) and value for value in values):
+        raise ValueError(
+            f"Guide field '{key}' must contain only non-empty strings: {guide_path}"
+        )
+    return tuple(values)

@@ -1,0 +1,67 @@
+guide:
+  name: "Peter Label Alignment Guide"
+  issue: "Label Alignment Off"
+  ordered_steps:
+    - id: "1"
+      title: "Inspect Label Guide"
+      description: "Check the label guide for looseness or misalignment."
+      failure_modes:
+        - "Label guide loosened"
+        - "Guide misalignment"
+      related_components:
+        - "Label Feed Assembly"
+        - "Label Guide"
+      actions:
+        pass: "Continue to tamp pad inspection if alignment drift persists."
+        fail: "Secure and realign the label guide before rebaseline."
+        verification: "Run 10 bottles and confirm alignment within tolerance"
+      ranking_keywords:
+        - "guide"
+
+    - id: "2"
+      title: "Inspect Tamp Pad"
+      description: "Check tamp pad condition and label transfer consistency."
+      failure_modes:
+        - "Tamp pad wear"
+        - "Poor label transfer"
+      related_components:
+        - "Tamp Cylinder"
+        - "Tamp Pad"
+      actions:
+        pass: "Continue to product stop position verification."
+        fail: "Clean or replace tamp pad before rebaseline."
+        verification: "Observe consistent label transfer"
+      ranking_keywords:
+        - "tamp"
+
+    - id: "3"
+      title: "Verify Product Stop Position"
+      description: "Check bottle presentation and stop repeatability."
+      failure_modes:
+        - "Product positioning variance"
+        - "Conveyor instability"
+      related_components:
+        - "Conveyor"
+        - "Product Detect Sensor"
+      actions:
+        pass: "Continue to sensor inspection."
+        fail: "Stabilize bottle stop position before rebaseline."
+        verification: "Measure bottle stop repeatability"
+      ranking_keywords:
+        - "positioning"
+
+    - id: "4"
+      title: "Inspect Sensors"
+      description: "Check readiness and applied-state sensor transitions."
+      failure_modes:
+        - "Label ready sensor contamination"
+        - "Applied sensor contamination"
+      related_components:
+        - "Label Ready Sensor"
+        - "Label Applied Sensor"
+      actions:
+        pass: "Document results and monitor next production run."
+        fail: "Clean and validate sensors before rebaseline."
+        verification: "Sensor transitions occur within expected timing window"
+      ranking_keywords:
+        - "sensor"
