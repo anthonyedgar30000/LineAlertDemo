@@ -230,3 +230,46 @@ If evidence contamination is detected:
 2. Reclassify statements into the proper categories.
 3. Lower confidence if uncertainty remains.
 4. Report the contamination in the Confidence Assessment section.
+
+## 13. Scope Attribution
+
+When reporting file modifications, the AI must distinguish between:
+
+### Current Operation Scope
+
+Files modified by the current task.
+
+### Branch Scope
+
+Files modified on the current branch.
+
+### Pull Request Scope
+
+Files included in the entire pull request.
+
+The AI must not report "Files Changed" without specifying which scope is being
+referenced.
+
+Required format:
+
+```text
+Current Operation Scope:
+
+- file_a
+- file_b
+
+Branch Scope:
+
+- file_a
+- file_b
+- file_c
+
+Pull Request Scope:
+
+- file_a
+- file_b
+- file_c
+- file_d
+```
+
+Failure to distinguish scope levels is considered reporting ambiguity.
