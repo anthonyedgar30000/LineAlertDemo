@@ -76,9 +76,10 @@ class SituationAssessment:
     topology_integrity: str
     confidence: float
     situation_summary: SituationSummary
+    evidence_summary: dict[str, object] | None = None
 
     def as_dict(self) -> dict[str, object]:
-        return {
+        output = {
             "assessment_id": self.assessment_id,
             "machine_state": self.machine_state,
             "cycles_observed": self.cycles_observed,
@@ -93,6 +94,9 @@ class SituationAssessment:
             "confidence": round(self.confidence, 3),
             "situation_summary": self.situation_summary.as_dict(),
         }
+        if self.evidence_summary is not None:
+            output["evidence_summary"] = dict(self.evidence_summary)
+        return output
 
 
 def build_situation_assessment(
@@ -104,6 +108,7 @@ def build_situation_assessment(
     baseline_comparison_results: dict[str, object] | None = None,
     relationship_measurements: Iterable[dict[str, object]] | None = None,
     cycle_statistics: dict[str, object] | None = None,
+    evidence_fusion_summary: dict[str, object] | None = None,
 ) -> SituationAssessment:
     """Create an evidence-only situation assessment.
 
@@ -167,6 +172,11 @@ def build_situation_assessment(
             topology_integrity=topology_integrity,
         ),
         situation_summary=summary,
+        evidence_summary=(
+            _evidence_summary(evidence_fusion_summary)
+            if evidence_fusion_summary is not None
+            else None
+        ),
     )
 
 
@@ -204,6 +214,26 @@ def format_situation_assessment(assessment: SituationAssessment) -> str:
         lines.extend(f"- {component}" for component in assessment.affected_components)
     else:
         lines.append("- None observed")
+    if assessment.evidence_summary is not None:
+        lines.extend(
+            [
+                "",
+                "Evidence Summary:",
+                (
+                    "- Evidence density: "
+                    f"{assessment.evidence_summary.get('evidence_density', 0)} observations"
+                ),
+                (
+                    "- Evidence sources contributing: "
+                    f"{assessment.evidence_summary.get('evidence_sources_contributing', 0)}"
+                ),
+                "- Observation clusters:",
+            ]
+        )
+        lines.extend(
+            f"  - {cluster}"
+            for cluster in assessment.evidence_summary.get("observation_clusters", [])
+        )
     lines.extend(
         [
             "",
@@ -361,6 +391,25 @@ def _confidence(
         confidence += 0.05
     confidence += 0.05 if topology_integrity == "Valid" else -0.10
     return max(0.0, min(0.95, confidence))
+
+
+def _evidence_summary(evidence_fusion_summary: dict[str, object]) -> dict[str, object]:
+    clusters = evidence_fusion_summary.get("observation_clusters") or []
+    return {
+        "evidence_count": evidence_fusion_summary.get("evidence_count", 0),
+        "evidence_density": evidence_fusion_summary.get("evidence_density", 0),
+        "evidence_sources_contributing": evidence_fusion_summary.get(
+            "sources_contributing", 0
+        ),
+        "evidence_source_distribution": dict(
+            evidence_fusion_summary.get("source_distribution") or {}
+        ),
+        "observation_clusters": [
+            str(cluster.get("cluster", ""))
+            for cluster in clusters
+            if isinstance(cluster, dict) and cluster.get("cluster")
+        ],
+    }
 
 
 def _average_present(values: Iterable[float | None]) -> float | None:
