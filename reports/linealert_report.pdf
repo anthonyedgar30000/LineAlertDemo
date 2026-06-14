@@ -1,0 +1,262 @@
+%PDF-1.4
+%‚„œ”
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [4 0 R 6 0 R 8 0 R] /Count 3 >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Courier >>
+endobj
+4 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 5 0 R >>
+endobj
+5 0 obj
+<< /Length 2554 >>
+stream
+BT /F1 7 Tf 36 756 Td 9 TL
+(ContextOS Governed Response) Tj T*
+(===========================) Tj T*
+() Tj T*
+(ContextOS Envelope:) Tj T*
+(request_id       : f5dab15b-52d2-44a0-a6e4-5c25927a28b1) Tj T*
+(source_app       : ContextOS) Tj T*
+(target_app       : LineAlertDemo) Tj T*
+(user_intent      : Label Alignment Off) Tj T*
+(operation_scope  : demo) Tj T*
+(evidence         : ContextOS matched intent 'Label Alignment Off' to registered application ) Tj T*
+('LineAlertDemo') Tj T*
+(assumptions      : Registered application mapping is safe to invoke locally) Tj T*
+(decision         : Proceed) Tj T*
+(confidence       : Medium-high) Tj T*
+(tradeoff_summary : Registered intent proceeds through the selected application; policy remains limited to) Tj T*
+( explicit registry mappings) Tj T*
+() Tj T*
+(Application Output:) Tj T*
+(Machine Context) Tj T*
+(===============) Tj T*
+() Tj T*
+(Machine:) Tj T*
+(Bottle Labeling Machine) Tj T*
+() Tj T*
+(Purpose:) Tj T*
+(Apply printed labels to bottles moving on a conveyor.) Tj T*
+() Tj T*
+(Physical Components) Tj T*
+() Tj T*
+(Conveyor) Tj T*
+(- Moves bottles through the labeling station.) Tj T*
+() Tj T*
+(Product Detect Sensor) Tj T*
+(- Detects bottle arrival.) Tj T*
+(- Starts the labeling sequence.) Tj T*
+() Tj T*
+(Print Engine) Tj T*
+(- Generates or confirms label print completion.) Tj T*
+() Tj T*
+(Label Feed Assembly) Tj T*
+(- Advances label stock into position.) Tj T*
+() Tj T*
+(Label Ready Sensor) Tj T*
+(- Confirms the label is available for application.) Tj T*
+() Tj T*
+(Tamp Cylinder) Tj T*
+(- Extends the tamp mechanism toward the bottle.) Tj T*
+() Tj T*
+(Tamp Pad) Tj T*
+(- Contacts or transfers the label onto the bottle surface.) Tj T*
+() Tj T*
+(Label Applied Sensor) Tj T*
+(- Confirms the label application event.) Tj T*
+() Tj T*
+(Tamp Home Sensor) Tj T*
+(- Confirms the tamp mechanism returned to home position.) Tj T*
+() Tj T*
+(Controller) Tj T*
+(- Coordinates machine sequence and timing.) Tj T*
+() Tj T*
+(Expected Interaction Model) Tj T*
+() Tj T*
+(Bottle Detect) Tj T*
+(->) Tj T*
+(Print Complete) Tj T*
+(->) Tj T*
+(Label Ready) Tj T*
+(->) Tj T*
+(Tamp Extend) Tj T*
+(->) Tj T*
+(Label Applied) Tj T*
+(->) Tj T*
+(Tamp Home) Tj T*
+() Tj T*
+(Interaction Explanation) Tj T*
+(During a normal cycle, the conveyor presents a bottle to the product detect sensor. The controller ) Tj T*
+(coordinates print completion, label feed readiness, tamp extension, label application confirmation, and ) Tj T*
+(tamp return before the next bottle is processed.) Tj T*
+() Tj T*
+(Monitored Relationships) Tj T*
+ET
+endstream
+endobj
+6 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 7 0 R >>
+endobj
+7 0 obj
+<< /Length 2991 >>
+stream
+BT /F1 7 Tf 36 756 Td 9 TL
+(- Bottle Detect -> Print Complete) Tj T*
+(- Print Complete -> Label Ready) Tj T*
+(- Label Ready -> Tamp Extend) Tj T*
+(- Tamp Extend -> Label Applied) Tj T*
+(- Label Applied -> Tamp Home) Tj T*
+() Tj T*
+(LineAlert Investigation Package) Tj T*
+(===============================) Tj T*
+() Tj T*
+(Machine) Tj T*
+(Bottle Labeling Machine) Tj T*
+() Tj T*
+(Issue) Tj T*
+(Label Alignment Off) Tj T*
+() Tj T*
+(Observed Evidence) Tj T*
+(- 2026-06-14T05:16:00.000Z Bottle Detect) Tj T*
+(- 2026-06-14T05:16:00.072Z Print Complete) Tj T*
+(- 2026-06-14T05:16:00.118Z Label Ready) Tj T*
+(- 2026-06-14T05:16:00.240Z Tamp Extend) Tj T*
+(- 2026-06-14T05:16:00.393Z Label Applied) Tj T*
+(- 2026-06-14T05:16:00.520Z Tamp Home) Tj T*
+(- Tamp Extend observed at 240 ms) Tj T*
+(- Label Applied observed at 393 ms) Tj T*
+(- Observed lag calculated from deterministic cycle data) Tj T*
+() Tj T*
+(Expected State) Tj T*
+(Tamp Extend -> Label Applied within 100 ms) Tj T*
+() Tj T*
+(Observed State) Tj T*
+(Tamp Extend -> Label Applied in 153 ms) Tj T*
+() Tj T*
+(Relationship Analysis) Tj T*
+(- Expected relationship: Tamp Extend precedes Label Applied by 100 ms) Tj T*
+(- Observed relationship: Tamp Extend precedes Label Applied by 153 ms) Tj T*
+(- Relationship integrity: Sequence valid; timing relationship shows moderate drift) Tj T*
+() Tj T*
+(Timing Analysis) Tj T*
+(- Expected lag: 100 ms) Tj T*
+(- Observed lag: 153 ms) Tj T*
+(- Delta: +53 ms) Tj T*
+() Tj T*
+(Drift Analysis) Tj T*
+(- No Drift: 0-10 ms delta) Tj T*
+(- Minor Drift: 11-30 ms delta) Tj T*
+(- Moderate Drift: 31-75 ms delta \(observed\)) Tj T*
+(- Severe Drift: >75 ms delta) Tj T*
+() Tj T*
+(Candidate Hypotheses) Tj T*
+(1. Label guide loosened - highest ranked possibility; could shift label path before tamp contact.) Tj T*
+(2. Tamp pad wear - could reduce consistent label transfer and add application delay.) Tj T*
+(3. Product positioning variance - could change bottle presentation during tamp extension.) Tj T*
+(4. Sensor contamination - could delay readiness or applied-state confirmation.) Tj T*
+() Tj T*
+(Peter Troubleshooting Guide) Tj T*
+(===========================) Tj T*
+(Guide: Peter Label Alignment Guide) Tj T*
+(Issue: Label Alignment Off) Tj T*
+() Tj T*
+(Prioritized Workflow) Tj T*
+(====================) Tj T*
+(1. Inspect Label Guide - Check the label guide for looseness or misalignment.) Tj T*
+(2. Inspect Tamp Pad - Check tamp pad condition and label transfer consistency.) Tj T*
+(3. Verify Product Stop Position - Check bottle presentation and stop repeatability.) Tj T*
+(4. Inspect Sensors - Check readiness and applied-state sensor transitions.) Tj T*
+() Tj T*
+(Troubleshooting Workflow) Tj T*
+(========================) Tj T*
+() Tj T*
+(Guide:) Tj T*
+(Peter Label Alignment Guide) Tj T*
+() Tj T*
+(Current Recommended Starting Step:) Tj T*
+(Inspect Label Guide) Tj T*
+() Tj T*
+(Reason:) Tj T*
+(Highest ranked hypothesis:) Tj T*
+(Label guide loosened) Tj T*
+() Tj T*
+(Supporting Evidence:) Tj T*
+ET
+endstream
+endobj
+8 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 9 0 R >>
+endobj
+9 0 obj
+<< /Length 2117 >>
+stream
+BT /F1 7 Tf 36 756 Td 9 TL
+(- Expected lag 100 ms) Tj T*
+(- Observed lag 153 ms) Tj T*
+(- Drift +53 ms) Tj T*
+() Tj T*
+(Verification Steps) Tj T*
+(==================) Tj T*
+(Verification Required:) Tj T*
+(Run 10 bottles and confirm alignment within tolerance) Tj T*
+(Confirm alignment restored) Tj T*
+() Tj T*
+(Step Details:) Tj T*
+(- Step 1: Inspect Label Guide) Tj T*
+(  Pass: Continue to tamp pad inspection if alignment drift persists.) Tj T*
+(  Fail: Secure and realign the label guide before rebaseline.) Tj T*
+(  Verify: Run 10 bottles and confirm alignment within tolerance) Tj T*
+(- Step 2: Inspect Tamp Pad) Tj T*
+(  Pass: Continue to product stop position verification.) Tj T*
+(  Fail: Clean or replace tamp pad before rebaseline.) Tj T*
+(  Verify: Observe consistent label transfer) Tj T*
+(- Step 3: Verify Product Stop Position) Tj T*
+(  Pass: Continue to sensor inspection.) Tj T*
+(  Fail: Stabilize bottle stop position before rebaseline.) Tj T*
+(  Verify: Measure bottle stop repeatability) Tj T*
+(- Step 4: Inspect Sensors) Tj T*
+(  Pass: Document results and monitor next production run.) Tj T*
+(  Fail: Clean and validate sensors before rebaseline.) Tj T*
+(  Verify: Sensor transitions occur within expected timing window) Tj T*
+() Tj T*
+(Recommended Actions) Tj T*
+(1. Inspect and secure the label guide before changing timing parameters.) Tj T*
+(2. Check tamp pad face condition and replace if wear or residue is observed.) Tj T*
+(3. Verify bottle stop, spacing, and conveyor presentation at the applicator station.) Tj T*
+(4. Clean and validate label-ready and applied-state sensors before rebaseline.) Tj T*
+() Tj T*
+(Escalation Guidance) Tj T*
+(Escalate to Operator Lead if moderate drift repeats after guide, tamp, and sensor checks.) Tj T*
+() Tj T*
+(Confidence Assessment) Tj T*
+(Medium-high: deterministic timing data shows a valid sequence with +53 ms drift; root cause is not ) Tj T*
+(confirmed.) Tj T*
+() Tj T*
+(Tradeoff Summary) Tj T*
+(Mechanical and sensor checks are low-risk first steps; changing timing baselines before inspection could ) Tj T*
+(mask the underlying cause.) Tj T*
+ET
+endstream
+endobj
+xref
+0 10
+0000000000 65535 f 
+0000000015 00000 n 
+0000000064 00000 n 
+0000000133 00000 n 
+0000000201 00000 n 
+0000000327 00000 n 
+0000002933 00000 n 
+0000003059 00000 n 
+0000006102 00000 n 
+0000006228 00000 n 
+trailer
+<< /Size 10 /Root 1 0 R >>
+startxref
+8397
+%%EOF
