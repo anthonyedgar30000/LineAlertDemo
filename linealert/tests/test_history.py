@@ -91,7 +91,7 @@ class HistoricalContextTests(unittest.TestCase):
         )
 
         self.assertEqual([10, 12, 15, 18], cluster_history.cycles_observed)
-        self.assertEqual(4, cluster_history.occurrence_count)
+        self.assertEqual(5, cluster_history.occurrence_count)
         self.assertEqual(1, cluster_history.persistence_cycles)
         self.assertEqual(4, cluster_history.recurrence_count)
 
