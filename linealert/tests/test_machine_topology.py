@@ -33,6 +33,7 @@ class MachineTopologyTests(unittest.TestCase):
         self.assertEqual([], report["orphan_components"])
         self.assertEqual([], report["circular_dependencies"])
         self.assertEqual([], report["disconnected_chains"])
+        self.assertEqual({}, report["events_mapped_to_unknown_components"])
         self.assertEqual([], report["observations"])
 
     def test_component_model_serializes_required_fields(self) -> None:
@@ -61,13 +62,13 @@ class MachineTopologyTests(unittest.TestCase):
         self.assertEqual(
             "\n".join(
                 [
-                    "ProductSensor",
+                    "Product Sensor",
                     "  ↓",
-                    "PrintHead",
+                    "Print Head",
                     "  ↓",
-                    "TampCylinder",
+                    "Tamp Cylinder",
                     "  ↓",
-                    "TampSensor",
+                    "Tamp Extended Sensor",
                 ]
             ),
             topology.visualize(),

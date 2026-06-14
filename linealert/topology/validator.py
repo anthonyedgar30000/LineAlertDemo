@@ -36,6 +36,7 @@ class TopologyValidationReport:
     orphan_components: list[str]
     circular_dependencies: list[str]
     disconnected_chains: list[list[str]]
+    events_mapped_to_unknown_components: dict[str, str]
     observations: list[TopologyValidationObservation]
 
     def as_dict(self) -> dict[str, object]:
@@ -44,6 +45,9 @@ class TopologyValidationReport:
             "orphan_components": list(self.orphan_components),
             "circular_dependencies": list(self.circular_dependencies),
             "disconnected_chains": [list(chain) for chain in self.disconnected_chains],
+            "events_mapped_to_unknown_components": dict(
+                self.events_mapped_to_unknown_components
+            ),
             "observations": [
                 observation.as_dict() for observation in self.observations
             ],
@@ -57,11 +61,13 @@ def validate_topology(topology: MachineTopology) -> TopologyValidationReport:
     orphan_components = _orphan_components(topology)
     circular_dependencies = _circular_dependencies(topology)
     disconnected_chains = _disconnected_chains(topology)
+    events_mapped_to_unknown_components = _events_mapped_to_unknown_components(topology)
     observations = [
         *_missing_component_observations(missing_components),
         *_orphan_observations(orphan_components),
         *_cycle_observations(circular_dependencies),
         *_disconnected_chain_observations(disconnected_chains),
+        *_unknown_event_mapping_observations(events_mapped_to_unknown_components),
     ]
 
     return TopologyValidationReport(
@@ -69,6 +75,7 @@ def validate_topology(topology: MachineTopology) -> TopologyValidationReport:
         orphan_components=orphan_components,
         circular_dependencies=circular_dependencies,
         disconnected_chains=disconnected_chains,
+        events_mapped_to_unknown_components=events_mapped_to_unknown_components,
         observations=observations,
     )
 
@@ -131,6 +138,16 @@ def _disconnected_chains(topology: MachineTopology) -> list[list[str]]:
     return groups
 
 
+def _events_mapped_to_unknown_components(
+    topology: MachineTopology,
+) -> dict[str, str]:
+    return {
+        event_name: component_id
+        for event_name, component_id in sorted(topology.event_component_map.items())
+        if component_id not in topology.components
+    }
+
+
 def _missing_component_observations(
     missing_components: list[str],
 ) -> list[TopologyValidationObservation]:
@@ -181,4 +198,19 @@ def _disconnected_chain_observations(
             details="Disconnected topology chain observed: " + " -> ".join(chain) + ".",
         )
         for chain in disconnected_chains
+    ]
+
+
+def _unknown_event_mapping_observations(
+    unknown_mappings: dict[str, str],
+) -> list[TopologyValidationObservation]:
+    return [
+        TopologyValidationObservation(
+            observation_type="UnknownEventComponentMapping",
+            component_id=component_id,
+            details=(
+                f"Event {event_name} maps to undefined component {component_id}."
+            ),
+        )
+        for event_name, component_id in unknown_mappings.items()
     ]

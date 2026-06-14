@@ -1,29 +1,35 @@
 {
   "components": [
     {
-      "component_id": "ProductSensor",
+      "component_id": "product_sensor",
       "name": "Product Sensor",
       "type": "Sensor"
     },
     {
-      "component_id": "PrintHead",
+      "component_id": "print_head",
       "name": "Print Head",
-      "type": "Printer"
+      "type": "Actuator"
     },
     {
-      "component_id": "TampCylinder",
+      "component_id": "tamp_cylinder",
       "name": "Tamp Cylinder",
       "type": "Actuator"
     },
     {
-      "component_id": "TampSensor",
-      "name": "Tamp Sensor",
+      "component_id": "tamp_sensor",
+      "name": "Tamp Extended Sensor",
       "type": "Sensor"
     }
   ],
   "dependencies": [
-    ["ProductSensor", "PrintHead"],
-    ["PrintHead", "TampCylinder"],
-    ["TampCylinder", "TampSensor"]
-  ]
+    ["product_sensor", "print_head"],
+    ["print_head", "tamp_cylinder"],
+    ["tamp_cylinder", "tamp_sensor"]
+  ],
+  "event_component_map": {
+    "ProductDetected": "product_sensor",
+    "PrintComplete": "print_head",
+    "TampExtendCommand": "tamp_cylinder",
+    "TampExtendedSensor": "tamp_sensor"
+  }
 }

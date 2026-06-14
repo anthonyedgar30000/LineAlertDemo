@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import json
 from collections import deque
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 
 from linealert.topology.component import Component
@@ -17,6 +17,7 @@ class MachineTopology:
 
     components: dict[str, Component]
     dependencies: list[Dependency]
+    event_component_map: dict[str, str] = field(default_factory=dict)
 
     @property
     def component_count(self) -> int:
@@ -65,6 +66,12 @@ class MachineTopology:
     def visualize(self) -> str:
         return visualize_topology(self)
 
+    def component_for_event(self, event_name: str) -> Component | None:
+        component_id = self.event_component_map.get(event_name)
+        if component_id is None:
+            return None
+        return self.components.get(component_id)
+
 
 def load_topology(config_path: str | Path) -> MachineTopology:
     """Load machine topology from JSON."""
@@ -77,7 +84,14 @@ def load_topology(config_path: str | Path) -> MachineTopology:
 
     components = _parse_components(raw_topology.get("components"))
     dependencies = _parse_dependencies(raw_topology.get("dependencies"))
-    return MachineTopology(components=components, dependencies=dependencies)
+    event_component_map = _parse_event_component_map(
+        raw_topology.get("event_component_map")
+    )
+    return MachineTopology(
+        components=components,
+        dependencies=dependencies,
+        event_component_map=event_component_map,
+    )
 
 
 def visualize_topology(topology: MachineTopology) -> str:
@@ -108,7 +122,7 @@ def visualize_topology(topology: MachineTopology) -> str:
     if not rendered_chains:
         rendered_chains = [[component_id] for component_id in sorted(topology.components)]
 
-    return "\n\n".join(_format_chain(chain) for chain in rendered_chains)
+    return "\n\n".join(_format_chain(chain, topology) for chain in rendered_chains)
 
 
 def topological_order(topology: MachineTopology) -> list[str]:
@@ -245,6 +259,17 @@ def _parse_dependencies(raw_dependencies: object) -> list[Dependency]:
     ]
 
 
+def _parse_event_component_map(raw_map: object) -> dict[str, str]:
+    if raw_map is None:
+        return {}
+    if not isinstance(raw_map, dict):
+        raise ValueError("Topology event_component_map must be an object")
+    return {
+        str(event_name): str(component_id)
+        for event_name, component_id in raw_map.items()
+    }
+
+
 def _parse_dependency(raw_dependency: object, index: int) -> Dependency:
     context = f"Dependency {index}"
     if isinstance(raw_dependency, list):
@@ -297,12 +322,13 @@ def _render_paths(
     return paths or [next_path]
 
 
-def _format_chain(chain: list[str]) -> str:
+def _format_chain(chain: list[str], topology: MachineTopology) -> str:
     lines: list[str] = []
     for index, component_id in enumerate(chain):
         if index > 0:
             lines.append("  ↓")
-        lines.append(component_id)
+        component = topology.components.get(component_id)
+        lines.append(component.name if component is not None else component_id)
     return "\n".join(lines)
 
 

@@ -296,8 +296,8 @@ Cycle 1
 
 ## Machine Topology
 
-Machine Topology represents component structure independently from event timing,
-cycle context, and evidence:
+Machine Topology represents component structure independently from timing
+relationships, state context, cycle context, and evidence:
 
 ```text
 Machine
@@ -308,11 +308,15 @@ Machine
 
 Events
 ↓
-Relationships
+Machine State Context
 ↓
 Cycles
 ↓
+Relationships
+↓
 Evidence
+↓
+Topology Context
 ```
 
 Topology provides structural context only.
@@ -327,11 +331,13 @@ linealert/topology/
 ├── __init__.py
 ├── component.py
 ├── dependency.py
+├── report.py
 ├── topology.py
 └── validator.py
 
 linealert/tests/
-└── test_machine_topology.py
+├── test_machine_topology.py
+└── test_topology.py
 ```
 
 ### Example Topology JSON
@@ -340,31 +346,37 @@ linealert/tests/
 {
   "components": [
     {
-      "component_id": "ProductSensor",
+      "component_id": "product_sensor",
       "name": "Product Sensor",
       "type": "Sensor"
     },
     {
-      "component_id": "PrintHead",
+      "component_id": "print_head",
       "name": "Print Head",
-      "type": "Printer"
+      "type": "Actuator"
     },
     {
-      "component_id": "TampCylinder",
+      "component_id": "tamp_cylinder",
       "name": "Tamp Cylinder",
       "type": "Actuator"
     },
     {
-      "component_id": "TampSensor",
-      "name": "Tamp Sensor",
+      "component_id": "tamp_sensor",
+      "name": "Tamp Extended Sensor",
       "type": "Sensor"
     }
   ],
   "dependencies": [
-    ["ProductSensor", "PrintHead"],
-    ["PrintHead", "TampCylinder"],
-    ["TampCylinder", "TampSensor"]
-  ]
+    ["product_sensor", "print_head"],
+    ["print_head", "tamp_cylinder"],
+    ["tamp_cylinder", "tamp_sensor"]
+  ],
+  "event_component_map": {
+    "ProductDetected": "product_sensor",
+    "PrintComplete": "print_head",
+    "TampExtendCommand": "tamp_cylinder",
+    "TampExtendedSensor": "tamp_sensor"
+  }
 }
 ```
 
@@ -378,6 +390,7 @@ linealert/tests/
   "orphan_components": [],
   "circular_dependencies": [],
   "disconnected_chains": [],
+  "events_mapped_to_unknown_components": {},
   "observations": []
 }
 ```
@@ -388,15 +401,35 @@ Topology validation detects structural observations only:
 - orphan components
 - circular dependencies
 - disconnected chains
+- events mapped to unknown components
 
 ### Example Topology Visualization
 
 ```text
-ProductSensor
+Product Sensor
   ↓
-PrintHead
+Print Head
   ↓
-TampCylinder
+Tamp Cylinder
   ↓
-TampSensor
+Tamp Extended Sensor
+```
+
+### Example Topology-Aware Evidence Record
+
+Topology context is attached outside the cycle and anomaly engines:
+
+```json
+{
+  "cycle_id": 42,
+  "machine_state": "Production",
+  "relationship": "Tamp Extension Lag",
+  "component_id": "tamp_cylinder",
+  "component_name": "Tamp Cylinder",
+  "observed_ms": 1100,
+  "baseline_ms": 600,
+  "status": "OutOfBaseline",
+  "upstream_components": ["print_head"],
+  "downstream_components": ["tamp_sensor"]
+}
 ```
