@@ -1,0 +1,7 @@
+Product Sensor
+  ↓
+Print Head
+  ↓
+Tamp Cylinder
+  ↓
+Tamp Extended Sensor
