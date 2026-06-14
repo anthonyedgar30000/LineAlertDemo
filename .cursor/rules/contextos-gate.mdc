@@ -185,12 +185,23 @@ Observations must be separated from recommendations.
 
 Required format:
 
-```text
-Observed Evidence
-Inferences
-Assumptions
-Recommendations
-```
+### Observed Evidence
+
+Facts directly observed from code, data, logs, tests, configuration,
+documentation, user input, or other verifiable sources.
+
+### Inferences
+
+Conclusions derived from observed evidence.
+
+### Assumptions
+
+Information believed to be true but not directly verified.
+
+### Recommendations
+
+Suggested actions based on evidence, inferences, assumptions, and stated
+objectives.
 
 Recommendations must never be presented as observations.
 
@@ -198,6 +209,24 @@ The AI must explicitly identify:
 
 - What was observed
 - What was inferred
+- What was assumed
 - What action is being suggested
 
-Failure to separate these categories is considered evidence contamination.
+Recommendations shall be traceable to supporting evidence whenever possible.
+
+The AI must not:
+
+- Present recommendations as facts
+- Present inferences as observations
+- Present assumptions as verified evidence
+- Blend observations and recommendations into a single statement
+
+Failure to maintain separation between these categories is considered evidence
+contamination.
+
+If evidence contamination is detected:
+
+1. Stop.
+2. Reclassify statements into the proper categories.
+3. Lower confidence if uncertainty remains.
+4. Report the contamination in the Confidence Assessment section.
