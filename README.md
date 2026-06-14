@@ -741,3 +741,129 @@ Evidence Density:
 Sources Contributing:
 3
 ```
+
+## Historical Context
+
+Historical Context preserves observations across cycles and reports observed
+history patterns without diagnosis, root-cause analysis, recommendations,
+corrective actions, AI reasoning, or predictions.
+
+```text
+Events
+↓
+Cycles
+↓
+Relationships
+↓
+Dependency Chains
+↓
+Baselines
+↓
+Topology Integrity
+↓
+Configuration Provenance
+↓
+Evidence Collection
+↓
+Evidence Fusion
+↓
+Situation Assessment
+```
+
+### Historical Context File Tree
+
+```text
+linealert/history/
+├── __init__.py
+├── drift_tracker.py
+├── observation_history.py
+├── persistence.py
+├── report.py
+└── trend_tracker.py
+
+linealert/tests/
+└── test_history.py
+```
+
+### Stored Historical Fields
+
+Historical observations preserve:
+
+- cycle id
+- timestamp
+- observation
+- evidence cluster
+- severity
+- confidence
+- source systems
+- source evidence
+
+### Example Historical Context JSON
+
+```json
+{
+  "cycles_observed": [10, 12, 15, 18],
+  "observation_summaries": [
+    {
+      "observation": "Tamp Extension Lag Exceeded Baseline",
+      "cycles": [10, 12, 15, 18],
+      "occurrences": 4,
+      "persistence_cycles": 1,
+      "recurrence_count": 4,
+      "severity_history": [
+        "Monitor",
+        "Monitor",
+        "Monitor",
+        "Significant Deviation"
+      ],
+      "source_systems": ["Baseline Analysis"]
+    }
+  ],
+  "evidence_density_trend": {
+    "density_by_cycle": {
+      "10": 1,
+      "12": 2,
+      "15": 1,
+      "18": 2
+    },
+    "direction": "Increasing"
+  },
+  "historical_drift_indicators": [
+    {
+      "metric_name": "Average Tamp Lag",
+      "start_cycle": 1,
+      "end_cycle": 60,
+      "start_value": 600,
+      "end_value": 1100,
+      "direction": "Increasing",
+      "status": "Historical Increase Detected"
+    }
+  ]
+}
+```
+
+### Human-Readable Historical Context
+
+```text
+HISTORICAL CONTEXT
+
+Observation:
+Tamp Extension Lag Exceeded Baseline
+
+Occurrences:
+4
+
+Persistence:
+1 consecutive cycles
+
+Evidence Density Trend:
+Increasing
+
+Historical Drift:
+Observed increasing from 600ms to 1100ms
+Historical Increase Detected
+
+No diagnosis or root-cause determination performed.
+No maintenance recommendations generated.
+No predictions generated.
+```
