@@ -7,10 +7,11 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
+from contextos import ContextRequest, ContextRouter
 from main import (
     AlertLine,
+    build_application_registry,
     build_demo_alerts,
-    evaluate_contextos_policy,
     main,
     render_alerts,
     run_contextos_request,
@@ -56,12 +57,27 @@ class RenderAlertsTests(unittest.TestCase):
         self.assertIn("LineAlert Output:", output)
         self.assertIn("Passenger guidance : Use the center display for reroutes", output)
 
-    def test_known_issue_policy_allows_line_alert_invocation(self) -> None:
-        decision = evaluate_contextos_policy("Label Alignment Off")
+    def test_line_alert_is_registered_application(self) -> None:
+        registry = build_application_registry()
+        application = registry.get_application("Label Alignment Off")
 
-        self.assertTrue(decision.may_invoke_line_alert)
-        self.assertEqual(decision.decision, "Proceed")
-        self.assertEqual(decision.confidence, "Medium-high")
+        self.assertIsNotNone(application)
+        self.assertEqual(application.name, "LineAlertDemo")
+
+    def test_contextos_router_selects_registered_line_alert_application(self) -> None:
+        request = ContextRequest.create(
+            user_intent="Label Alignment Off",
+            request_id="test-request",
+        )
+        response = ContextRouter(build_application_registry()).route(request)
+
+        self.assertEqual(response.target_app, "LineAlertDemo")
+        self.assertEqual(response.decision, "Proceed")
+        self.assertEqual(response.confidence, "Medium-high")
+        self.assertIn(
+            "Passenger guidance : Use the center display for reroutes",
+            response.application_output,
+        )
 
     def test_unknown_issue_policy_skips_line_alert_invocation(self) -> None:
         output = run_contextos_request("Unexpected Platform Fire", request_id="test-request")
@@ -69,16 +85,16 @@ class RenderAlertsTests(unittest.TestCase):
         self.assertIn("decision         : Investigate Further", output)
         self.assertIn("confidence       : Low", output)
         self.assertIn(
-            "evidence         : ContextOS did not recognize issue "
-            "'Unexpected Platform Fire'; LineAlertDemo was not invoked",
+            "evidence         : ContextOS did not recognize intent "
+            "'Unexpected Platform Fire'; no registered application was invoked",
             output,
         )
         self.assertIn(
-            "assumptions      : No safe demo mapping exists for the requested issue",
+            "assumptions      : No safe registered application mapping exists for the request",
             output,
         )
-        self.assertIn("LineAlert Output: SKIPPED", output)
-        self.assertIn("LineAlertDemo was not invoked by ContextOS policy.", output)
+        self.assertIn("Application Output: SKIPPED", output)
+        self.assertIn("Unresolved was not invoked by ContextOS policy.", output)
         self.assertNotIn("Demo scenario loaded", output)
 
     def test_demo_cli_routes_through_contextos(self) -> None:
