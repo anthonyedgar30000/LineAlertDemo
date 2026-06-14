@@ -70,6 +70,84 @@ def classify_drift(delta_ms: int) -> str:
     return "Severe Drift"
 
 
+def render_machine_context() -> str:
+    """Render physical machine context for the LineAlert application."""
+
+    rendered_rows = [
+        "Machine Context",
+        "===============",
+        "",
+        "Machine:",
+        MACHINE_NAME,
+        "",
+        "Purpose:",
+        "Apply printed labels to bottles moving on a conveyor.",
+        "",
+        "Physical Components",
+        "",
+        "Conveyor",
+        "- Moves bottles through the labeling station.",
+        "",
+        "Product Detect Sensor",
+        "- Detects bottle arrival.",
+        "- Starts the labeling sequence.",
+        "",
+        "Print Engine",
+        "- Generates or confirms label print completion.",
+        "",
+        "Label Feed Assembly",
+        "- Advances label stock into position.",
+        "",
+        "Label Ready Sensor",
+        "- Confirms the label is available for application.",
+        "",
+        "Tamp Cylinder",
+        "- Extends the tamp mechanism toward the bottle.",
+        "",
+        "Tamp Pad",
+        "- Contacts or transfers the label onto the bottle surface.",
+        "",
+        "Label Applied Sensor",
+        "- Confirms the label application event.",
+        "",
+        "Tamp Home Sensor",
+        "- Confirms the tamp mechanism returned to home position.",
+        "",
+        "Controller",
+        "- Coordinates machine sequence and timing.",
+        "",
+        "Expected Interaction Model",
+        "",
+        "Bottle Detect",
+        "->",
+        "Print Complete",
+        "->",
+        "Label Ready",
+        "->",
+        "Tamp Extend",
+        "->",
+        "Label Applied",
+        "->",
+        "Tamp Home",
+        "",
+        "Interaction Explanation",
+        (
+            "During a normal cycle, the conveyor presents a bottle to the product "
+            "detect sensor. The controller coordinates print completion, label "
+            "feed readiness, tamp extension, label application confirmation, and "
+            "tamp return before the next bottle is processed."
+        ),
+        "",
+        "Monitored Relationships",
+        "- Bottle Detect -> Print Complete",
+        "- Print Complete -> Label Ready",
+        "- Label Ready -> Tamp Extend",
+        "- Tamp Extend -> Label Applied",
+        "- Label Applied -> Tamp Home",
+    ]
+    return "\n".join(rendered_rows)
+
+
 def render_linealert_report(issue: str) -> str:
     """Render a deterministic industrial investigation package."""
 
@@ -78,6 +156,8 @@ def render_linealert_report(issue: str) -> str:
     drift_classification = classify_drift(timing.delta_ms)
 
     rendered_rows = [
+        render_machine_context(),
+        "",
         "LineAlert Investigation Package",
         "===============================",
         "",

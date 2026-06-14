@@ -24,6 +24,27 @@ FORBIDDEN_DEMO_TERMS = (
     "center display",
 )
 
+PHYSICAL_COMPONENTS = (
+    "Conveyor",
+    "Product Detect Sensor",
+    "Print Engine",
+    "Label Feed Assembly",
+    "Label Ready Sensor",
+    "Tamp Cylinder",
+    "Tamp Pad",
+    "Label Applied Sensor",
+    "Tamp Home Sensor",
+    "Controller",
+)
+
+MONITORED_RELATIONSHIPS = (
+    "Bottle Detect -> Print Complete",
+    "Print Complete -> Label Ready",
+    "Label Ready -> Tamp Extend",
+    "Tamp Extend -> Label Applied",
+    "Label Applied -> Tamp Home",
+)
+
 
 class RenderAlertsTests(unittest.TestCase):
     def test_demo_cycle_has_expected_timing_drift(self) -> None:
@@ -37,6 +58,20 @@ class RenderAlertsTests(unittest.TestCase):
     def test_label_alignment_issue_demo_contains_investigation_package(self) -> None:
         output = render_linealert_report("Label Alignment Off")
 
+        self.assertIn("Machine Context", output)
+        self.assertLess(
+            output.index("Machine Context"),
+            output.index("LineAlert Investigation Package"),
+        )
+        self.assertIn("Purpose:", output)
+        self.assertIn(
+            "Apply printed labels to bottles moving on a conveyor.",
+            output,
+        )
+        self.assertIn("Physical Components", output)
+        self.assertIn("Expected Interaction Model", output)
+        self.assertIn("Interaction Explanation", output)
+        self.assertIn("Monitored Relationships", output)
         self.assertIn("LineAlert Investigation Package", output)
         self.assertIn("Machine\nBottle Labeling Machine", output)
         self.assertIn("Issue\nLabel Alignment Off", output)
@@ -61,6 +96,10 @@ class RenderAlertsTests(unittest.TestCase):
         self.assertIn("Escalation Guidance", output)
         self.assertIn("Confidence Assessment", output)
         self.assertIn("Tradeoff Summary", output)
+        for component in PHYSICAL_COMPONENTS:
+            self.assertIn(component, output)
+        for relationship in MONITORED_RELATIONSHIPS:
+            self.assertIn(relationship, output)
         for term in FORBIDDEN_DEMO_TERMS:
             self.assertNotIn(term, output)
 
@@ -77,6 +116,7 @@ class RenderAlertsTests(unittest.TestCase):
         self.assertIn("decision", output)
         self.assertIn("Proceed", output)
         self.assertIn("Application Output:", output)
+        self.assertIn("Machine Context", output)
         self.assertIn("LineAlert Investigation Package", output)
         self.assertIn("- Delta: +53 ms", output)
         self.assertIn(
@@ -109,6 +149,9 @@ class RenderAlertsTests(unittest.TestCase):
             "LineAlert Investigation Package",
             response.application_output,
         )
+        self.assertIn("Machine Context", response.application_output)
+        for component in PHYSICAL_COMPONENTS:
+            self.assertIn(component, response.application_output)
         self.assertIn("- Delta: +53 ms", response.application_output)
         for term in FORBIDDEN_DEMO_TERMS:
             self.assertNotIn(term, response.application_output)
@@ -142,6 +185,7 @@ class RenderAlertsTests(unittest.TestCase):
         self.assertIn("ContextOS Governed Response", output)
         self.assertIn("ContextOS Envelope:", output)
         self.assertIn("Application Output:", output)
+        self.assertIn("Machine Context", output)
         for term in FORBIDDEN_DEMO_TERMS:
             self.assertNotIn(term, output)
 
