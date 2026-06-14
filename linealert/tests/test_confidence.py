@@ -164,7 +164,7 @@ class ObservationConfidenceTests(unittest.TestCase):
         self.assertEqual(1.0, report["confidence"])
         self.assertEqual("Very High", report["classification"])
         self.assertIn("OBSERVATION CONFIDENCE", text)
-        self.assertIn("Confidence:\n0.950", text)
+        self.assertIn("Confidence:\n1.000", text)
         self.assertIn("Classification:\nVery High", text)
         self.assertIn("Supporting Factors:", text)
         self.assertIn("RelationshipIntegrity=Valid", text)
