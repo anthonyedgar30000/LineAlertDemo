@@ -96,3 +96,104 @@ python3 simulator/plc_simulator.py --config config/simulator.json
 
 The current LineAlert CSV loader requires `timestamp,event_name` and tolerates
 the simulator's additional `value` column.
+
+## Deterministic Validation Suite
+
+The validation suite proves that behavioral degradation can be detected from
+event timelines alone. It keeps the flow separate:
+
+```text
+Events
+↓
+Evidence
+↓
+Analysis
+↓
+Recommendations
+```
+
+Recommendations are not part of this layer.
+
+### Validation File Tree
+
+```text
+config/
+└── event_relationships.json
+validation/
+├── __init__.py
+├── anomaly_detector.py
+├── baseline.py
+├── report_generator.py
+└── scenarios.py
+linealert/tests/
+└── test_validation.py
+```
+
+### Timing Model
+
+`config/event_relationships.json` defines first-version timing relationships:
+
+```json
+{
+  "relationships": [
+    {
+      "name": "Tamp Extension Lag",
+      "from": "TampExtendCommand",
+      "to": "TampExtendedSensor",
+      "type": "lag"
+    }
+  ]
+}
+```
+
+### Example Baseline
+
+Generated from Normal simulator cycles:
+
+```json
+{
+  "relationships": {
+    "TampExtendCommand->TampExtendedSensor": {
+      "avg_ms": 600.0,
+      "stddev_ms": 0.0,
+      "sample_count": 20
+    }
+  },
+  "cycle_duration_ms": {
+    "avg_ms": 4800.0,
+    "stddev_ms": 0.0,
+    "sample_count": 20
+  }
+}
+```
+
+### Example Anomaly Report
+
+SlowTamp produces lag evidence only:
+
+```json
+{
+  "issue_type": "ExcessiveLag",
+  "relationship": "Tamp Extension Lag",
+  "baseline_lag_ms": 600.0,
+  "observed_lag_ms": 1100.0,
+  "deviation_percent": 83.333,
+  "severity": "High",
+  "confidence": 0.99,
+  "evidence_count": 20
+}
+```
+
+### Validation Scenarios
+
+- `Normal`: no anomaly.
+- `SlowTamp`: lag anomaly, sequence remains valid.
+- `MissedSensor`: missing event and sequence evidence.
+- `Drift`: increasing lag deviation evidence.
+- `RandomJitter`: rhythm instability evidence.
+
+Run verification:
+
+```bash
+python3 -m unittest discover "linealert/tests"
+```
