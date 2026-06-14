@@ -178,3 +178,26 @@ Before committing, report:
 
 If scope expansion occurred without clear user approval, stop and ask for
 confirmation.
+
+## 12. Recommendation Separation
+
+Observations must be separated from recommendations.
+
+Required format:
+
+```text
+Observed Evidence
+Inferences
+Assumptions
+Recommendations
+```
+
+Recommendations must never be presented as observations.
+
+The AI must explicitly identify:
+
+- What was observed
+- What was inferred
+- What action is being suggested
+
+Failure to separate these categories is considered evidence contamination.
