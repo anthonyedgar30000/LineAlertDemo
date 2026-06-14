@@ -1,11 +1,13 @@
+import io
 import sys
 import unittest
+from contextlib import redirect_stdout
 from pathlib import Path
 
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
-from main import AlertLine, build_demo_alerts, render_alerts
+from main import AlertLine, build_demo_alerts, main, render_alerts, run_contextos_request
 
 
 class RenderAlertsTests(unittest.TestCase):
@@ -31,6 +33,33 @@ class RenderAlertsTests(unittest.TestCase):
 
         self.assertIn("Label Alignment Off", output)
         self.assertIn("Passenger guidance : Use the center display for reroutes", output)
+
+    def test_contextos_request_wraps_line_alert_output(self) -> None:
+        output = run_contextos_request("Label Alignment Off", request_id="test-request")
+
+        self.assertIn("ContextOS Envelope:", output)
+        self.assertIn("request_id", output)
+        self.assertIn("test-request", output)
+        self.assertIn("source_app", output)
+        self.assertIn("ContextOS", output)
+        self.assertIn("target_app", output)
+        self.assertIn("LineAlertDemo", output)
+        self.assertIn("decision", output)
+        self.assertIn("Proceed", output)
+        self.assertIn("LineAlert Output:", output)
+        self.assertIn("Passenger guidance : Use the center display for reroutes", output)
+
+    def test_demo_cli_routes_through_contextos(self) -> None:
+        buffer = io.StringIO()
+
+        with redirect_stdout(buffer):
+            exit_code = main(["--demo", "--issue", "Label Alignment Off"])
+
+        output = buffer.getvalue()
+        self.assertEqual(exit_code, 0)
+        self.assertIn("ContextOS Governed Response", output)
+        self.assertIn("ContextOS Envelope:", output)
+        self.assertIn("LineAlert Output:", output)
 
 
 if __name__ == "__main__":
