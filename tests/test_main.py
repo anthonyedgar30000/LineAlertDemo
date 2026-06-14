@@ -83,6 +83,16 @@ class RenderAlertsTests(unittest.TestCase):
         self.assertIn("Tamp Extend -> Label Applied within 100 ms", output)
         self.assertIn("Observed State", output)
         self.assertIn("Tamp Extend -> Label Applied in 153 ms", output)
+        self.assertIn("Simulated Full-Vision Evidence Package", output)
+        self.assertIn("Vision Measurement Evidence", output)
+        self.assertIn("Picture Evidence", output)
+        self.assertIn("Operator Feedback Evidence", output)
+        self.assertIn("Maintenance Feedback Evidence", output)
+        self.assertIn("Inline Sensor Evidence", output)
+        self.assertIn("Handheld Diagnostic Tool Evidence", output)
+        self.assertIn("10-bottle validation sample after guide adjustment: 10/10 bottles within tolerance", output)
+        self.assertIn("Guide clamp condition: loose.", output)
+        self.assertIn("Digital PSI gauge at tamp line: 71 psi steady", output)
         self.assertIn("Relationship Analysis", output)
         self.assertIn("Timing Analysis", output)
         self.assertIn("- Delta: +53 ms", output)
@@ -122,7 +132,7 @@ class RenderAlertsTests(unittest.TestCase):
         self.assertIn("Recommended Actions", output)
         self.assertIn("Escalation Guidance", output)
         self.assertIn("Confidence Assessment", output)
-        self.assertIn("Root Cause Status:\nNot conclusively proven", output)
+        self.assertIn("Root Cause Status:\nConfirmed in simulated evidence package", output)
         self.assertIn("Most Likely Explanation:\nLabel guide loosened", output)
         self.assertIn("Reasoning Summary", output)
         self.assertIn("Tradeoff Summary", output)
@@ -137,21 +147,36 @@ class RenderAlertsTests(unittest.TestCase):
         output = render_linealert_report("Label Alignment Off")
 
         self.assertIn("Confidence score: 0.86", output)
-        self.assertIn("Confidence score: 0.78", output)
+        self.assertIn("Confidence score: 0.94", output)
         self.assertIn("Supporting evidence:", output)
         self.assertIn(
             "Observed +53 ms moderate drift at the transfer-stage relationship.",
             output,
         )
+        self.assertIn(
+            "Simulated maintenance photo shows loose guide clamp and guide ring offset.",
+            output,
+        )
         self.assertIn("Contradicting evidence:", output)
         self.assertIn(
-            "No direct physical inspection result confirms guide looseness.",
+            "Inline PSI, RPM, motor load, and sensor checks are within tolerance.",
             output,
         )
         self.assertIn("Missing context:", output)
         self.assertIn("Recommended validation step:", output)
-        self.assertIn("Root Cause Status:\nNot conclusively proven", output)
+        self.assertIn("Root Cause Status:\nConfirmed in simulated evidence package", output)
         self.assertIn("Reasoning Summary\n=================", output)
+
+    def test_simulated_full_vision_package_contains_high_leverage_evidence(self) -> None:
+        output = render_linealert_report("Label Alignment Off")
+
+        self.assertIn("operator_failed_label_001.jpg", output)
+        self.assertIn("maintenance_guide_clamp_before.jpg", output)
+        self.assertIn("validation_10_bottle_after.jpg", output)
+        self.assertIn("Mechanical clicker at Tamp Extend: triggered on all 10 validation cycles", output)
+        self.assertIn("Label feed motor heat sensor: 54 C, within normal range", output)
+        self.assertIn("Digital calipers: guide ring offset measured at +2.0 mm before correction and +0.2 mm after correction", output)
+        self.assertIn("Handheld signal tester: label-applied sensor transition clean after guide adjustment", output)
 
     def test_troubleshooting_engine_ranks_peter_guide_from_hypotheses(self) -> None:
         engine = TroubleshootingEngine()

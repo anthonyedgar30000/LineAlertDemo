@@ -45,6 +45,7 @@ TRANSITIVE_REASONING_CHAIN = (
     "Tamp Extend",
     "Label Applied",
 )
+SIMULATED_FULL_VISION_ENABLED = True
 
 
 @dataclass(frozen=True)
@@ -126,100 +127,103 @@ def build_hypothesis_assessments(
     return (
         HypothesisAssessment(
             hypothesis="Label guide loosened",
-            confidence_score="0.78",
+            confidence_score="0.94",
             supporting_evidence=(
                 f"Observed {drift_summary} at the transfer-stage relationship.",
                 "Event order remains valid, which points away from a sequence-control fault.",
                 "Peter guide ranks label guide inspection as the first workflow step.",
+                "Simulated operator photo shows label skew matching guide-side drift.",
+                "Simulated maintenance photo shows loose guide clamp and guide ring offset.",
+                "Simulated post-adjustment vision sample shows 10/10 bottles within tolerance.",
             ),
             contradicting_evidence=(
-                "No direct physical inspection result confirms guide looseness.",
-                "No before/after guide adjustment sample is available.",
+                "Inline PSI, RPM, motor load, and sensor checks are within tolerance.",
+                "Tamp pad inspection shows only minor wear and no residue buildup.",
             ),
             reasoning_rationale=(
-                "A loose guide can shift the label path before tamp contact while preserving "
-                "the controller event sequence."
+                "The simulated visual, maintenance, and post-adjustment validation evidence "
+                "directly aligns with a guide-position fault while other subsystem checks "
+                "remain within tolerance."
             ),
             missing_context=(
-                "Guide clamp condition",
-                "Label path alignment measurement",
-                "Post-adjustment bottle sample",
+                "Longer production-run validation after the 10-bottle sample",
+                "Historical trend showing when guide position began drifting",
             ),
             recommended_validation_step=(
-                "Inspect and secure the label guide, then run 10 bottles and confirm "
-                "alignment within tolerance."
+                "Keep the guide secured, run an extended sample, and monitor whether "
+                "alignment and timing remain within tolerance."
             ),
         ),
         HypothesisAssessment(
             hypothesis="Tamp pad wear",
-            confidence_score="0.64",
+            confidence_score="0.36",
             supporting_evidence=(
                 f"Observed {drift_summary} between tamp extension and label application.",
                 "The affected relationship includes the tamp transfer stage.",
             ),
             contradicting_evidence=(
-                "No tamp pad wear measurement or residue observation is available.",
-                "The first-ranked guide evidence aligns more directly with label path guidance.",
+                "Simulated tamp pad photo shows only minor wear and no residue buildup.",
+                "Inline PSI and clicker evidence indicate normal tamp actuation.",
+                "Post-guide-adjustment validation restores alignment without pad replacement.",
             ),
             reasoning_rationale=(
-                "A worn tamp pad could slow or destabilize label transfer after extension, "
-                "but the demo evidence does not directly inspect pad condition."
+                "Tamp pad wear remains mechanically possible, but simulated inspection and "
+                "post-adjustment results make it less likely than guide looseness."
             ),
             missing_context=(
-                "Tamp pad face condition",
-                "Transfer pressure consistency",
-                "Residue or wear inspection result",
+                "Long-term tamp pad wear trend",
+                "Pad durometer measurement",
             ),
             recommended_validation_step=(
-                "Inspect the tamp pad surface and verify consistent label transfer."
+                "Recheck tamp pad condition if alignment drift returns after guide validation."
             ),
         ),
         HypothesisAssessment(
             hypothesis="Product positioning variance",
-            confidence_score="0.56",
+            confidence_score="0.31",
             supporting_evidence=(
                 "Bottle presentation occurs upstream of the delayed label application event.",
                 "Position variance could make tamp contact less repeatable.",
             ),
             contradicting_evidence=(
-                "The observed event sequence is valid through Tamp Extend.",
-                "No bottle stop repeatability data is available.",
+                "Simulated caliper sample shows bottle stop repeatability within tolerance.",
+                "Simulated conveyor RPM remains stable during failed and corrected samples.",
+                "Post-guide-adjustment validation restores alignment without product-stop changes.",
             ),
             reasoning_rationale=(
-                "An upstream positioning issue can plausibly surface downstream as label "
-                "application delay, but the current evidence does not isolate bottle position."
+                "Upstream positioning can propagate downstream, but the simulated bottle "
+                "position and conveyor evidence does not support it as the primary cause."
             ),
             missing_context=(
-                "Bottle stop repeatability measurement",
-                "Conveyor spacing observations",
-                "Product presentation photos or sensor traces",
+                "Larger bottle-position sample across multiple SKUs",
+                "Changeover fixture inspection record",
             ),
             recommended_validation_step=(
-                "Measure bottle stop repeatability at the applicator station."
+                "Continue monitoring bottle stop repeatability during the extended validation run."
             ),
         ),
         HypothesisAssessment(
             hypothesis="Sensor contamination",
-            confidence_score="0.49",
+            confidence_score="0.24",
             supporting_evidence=(
                 "The delayed observed state depends on Label Applied sensor confirmation.",
                 "Sensor contamination could delay readiness or applied-state detection.",
             ),
             contradicting_evidence=(
-                "The sequence remains valid with no missing or reordered sensor events.",
-                "No sensor signal quality or contamination inspection evidence is available.",
+                "Simulated sensor photo shows a clean label-applied sensor face.",
+                "Simulated handheld signal tester shows clean sensor transitions.",
+                "No missing, reordered, or bouncing sensor events appear in the cycle trace.",
             ),
             reasoning_rationale=(
-                "A contaminated sensor could report application late, but the deterministic "
-                "cycle does not show sensor dropout or sequence instability."
+                "Sensor contamination is weakly supported because simulated visual and "
+                "electrical checks show normal sensor condition and transitions."
             ),
             missing_context=(
-                "Sensor lens inspection",
-                "Signal transition trace",
-                "Sensor cleaning validation result",
+                "Longer sensor-transition trend under production vibration",
+                "Electrical noise capture during peak line speed",
             ),
             recommended_validation_step=(
-                "Clean and validate label-ready and applied-state sensor transitions."
+                "Retest sensor transitions only if drift returns without guide movement."
             ),
         ),
     )
@@ -303,6 +307,67 @@ def render_machine_context() -> str:
     return "\n".join(rendered_rows)
 
 
+def render_simulated_full_vision_evidence() -> str:
+    """Render deterministic simulated evidence that a real deployment would package."""
+
+    rendered_rows = [
+        "Simulated Full-Vision Evidence Package",
+        "======================================",
+        "Simulation Mode:",
+        "Enabled for deterministic demo; evidence represents what a connected LineAlert deployment would package from operators, maintenance, cameras, handheld tools, and inline sensors.",
+        "",
+        "Vision Measurement Evidence",
+        "---------------------------",
+        "- Failed bottle sample: horizontal offset +3.2 mm, vertical offset +0.6 mm, skew angle 2.4 degrees.",
+        "- Alignment tolerance: +/-1.5 mm horizontal, +/-1.0 degree skew.",
+        "- Good comparison bottle after adjustment: horizontal offset +0.4 mm, skew angle 0.3 degrees.",
+        "- 10-bottle validation sample after guide adjustment: 10/10 bottles within tolerance.",
+        "",
+        "Picture Evidence",
+        "----------------",
+        "- operator_failed_label_001.jpg: label visibly skewed right; linked hypothesis: Label guide loosened; evidence strength: High.",
+        "- maintenance_guide_clamp_before.jpg: guide clamp visibly loose and guide ring offset; linked hypothesis: Label guide loosened; evidence strength: High.",
+        "- maintenance_tamp_pad_before.jpg: minor tamp pad wear, no residue buildup; linked hypothesis: Tamp pad wear; evidence strength: Low.",
+        "- sensor_face_before.jpg: label-applied sensor face clean; linked hypothesis: Sensor contamination; evidence strength: Low.",
+        "- validation_10_bottle_after.jpg: post-adjustment bottles within alignment tolerance; linked hypothesis: Label guide loosened; evidence strength: High.",
+        "",
+        "Operator Feedback Evidence",
+        "--------------------------",
+        "- Operator observed label skew after changeover: yes.",
+        "- Operator observed product wobble: no.",
+        "- Operator heard abnormal tamp motion: no.",
+        "- Operator confidence: medium-high because skew pattern repeated before guide adjustment.",
+        "",
+        "Maintenance Feedback Evidence",
+        "-----------------------------",
+        "- Label guide checked: yes.",
+        "- Guide clamp condition: loose.",
+        "- Guide ring position: offset toward outboard side.",
+        "- Corrective action: guide secured and guide ring realigned.",
+        "- Result after action: alignment restored during 10-bottle validation sample.",
+        "",
+        "Inline Sensor Evidence",
+        "----------------------",
+        "- Digital PSI gauge at tamp line: 71 psi steady; expected range 68-75 psi.",
+        "- Mechanical clicker at Tamp Extend: triggered on all 10 validation cycles.",
+        "- Mechanical clicker at Tamp Home: triggered on all 10 validation cycles.",
+        "- Conveyor RPM sensor: 142 RPM, stable within +/-1.0%.",
+        "- Label feed roller RPM sensor: 142 RPM, matched conveyor ratio within +/-1.0%.",
+        "- Label feed motor load sensor: 1.1 A average, no binding spike.",
+        "- Label feed motor heat sensor: 54 C, within normal range.",
+        "",
+        "Handheld Diagnostic Tool Evidence",
+        "---------------------------------",
+        "- Digital calipers: guide ring offset measured at +2.0 mm before correction and +0.2 mm after correction.",
+        "- Handheld tachometer: conveyor and label feed rollers matched target speed.",
+        "- Digital pressure gauge: tamp pressure remained within tolerance during actuation.",
+        "- Clamp meter: label feed motor current stayed within baseline range.",
+        "- IR thermometer: label feed motor temperature remained within normal range.",
+        "- Handheld signal tester: label-applied sensor transition clean after guide adjustment.",
+    ]
+    return "\n".join(rendered_rows)
+
+
 def render_reasoning_engine_sections(
     events: Sequence[MachineEvent],
     timing: TimingAnalysis,
@@ -329,6 +394,7 @@ def render_reasoning_engine_sections(
         f"- Expected lag {timing.expected_lag_ms} ms",
         f"- Observed lag {timing.observed_lag_ms} ms",
         "- Deterministic cycle timestamps preserve event order",
+        "- Simulated vision validation shows alignment restored after guide correction",
         "",
         "Topological Reasoning",
         "=====================",
@@ -347,6 +413,7 @@ def render_reasoning_engine_sections(
         "- Bottle Detect, Print Complete, and Label Ready occurred before Tamp Extend",
         "- Label Applied followed Tamp Extend but exceeded the expected lag",
         "- Monitored relationship identifies the affected transfer-stage edge",
+        "- Simulated inline PSI, RPM, motor load, and sensor checks reduce support for pneumatic, speed, load, and sensor faults",
         "",
         "Constraint Reasoning",
         "====================",
@@ -358,6 +425,7 @@ def render_reasoning_engine_sections(
         f"- Expected lag {timing.expected_lag_ms} ms",
         f"- Observed lag {timing.observed_lag_ms} ms",
         f"- Delta +{timing.delta_ms} ms falls in the {drift_classification} band",
+        "- Simulated guide correction brings 10-bottle validation sample back within alignment tolerance",
         "",
         "Transitive Reasoning",
         "====================",
@@ -368,11 +436,12 @@ def render_reasoning_engine_sections(
             "but current evidence localizes the measured deviation at Tamp Extend -> "
             "Label Applied."
         ),
-        "Confidence score: 0.68",
+        "Confidence score: 0.76",
         "Evidence used:",
         "- Bottle Detect precedes Label Ready",
         "- Label Ready precedes Tamp Extend",
         "- Tamp Extend precedes delayed Label Applied",
+        "- Simulated bottle stop and conveyor speed evidence reduces upstream product-position support",
         "",
         "Abductive Hypothesis Ranking",
         "============================",
@@ -412,7 +481,7 @@ def render_reasoning_engine_sections(
     rendered_rows.extend(
         [
             "Root Cause Status:",
-            "Not conclusively proven",
+            "Confirmed in simulated evidence package",
             "",
             "Most Likely Explanation:",
             "Label guide loosened",
@@ -420,16 +489,17 @@ def render_reasoning_engine_sections(
             "Why:",
             (
                 "Highest evidence alignment based on timing drift, preserved event "
-                "sequence, and mechanical transfer-stage deviation."
+                "sequence, simulated guide-clamp photo evidence, guide offset "
+                "measurement, and post-adjustment validation."
             ),
             "",
             "Reasoning Summary",
             "=================",
             "- Most likely explanation: Label guide loosened",
-            "- Confidence score: 0.78",
+            "- Confidence score: 0.94",
             (
-                "- Why this is not certain: no direct inspection, adjustment result, "
-                "or repeated physical measurement confirms the guide condition."
+                "- Why this is not absolute certainty: simulated evidence is deterministic "
+                "demo data and still needs longer production-run validation."
             ),
             (
                 "- What evidence would confirm it: loose guide found during inspection "
@@ -488,6 +558,8 @@ def render_linealert_report(issue: str) -> str:
             "- Tamp Extend observed at 240 ms",
             "- Label Applied observed at 393 ms",
             "- Observed lag calculated from deterministic cycle data",
+            "",
+            render_simulated_full_vision_evidence(),
             "",
             "Expected State",
             "Tamp Extend -> Label Applied within 100 ms",
