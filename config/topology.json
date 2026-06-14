@@ -1,0 +1,29 @@
+{
+  "components": [
+    {
+      "component_id": "ProductSensor",
+      "name": "Product Sensor",
+      "type": "Sensor"
+    },
+    {
+      "component_id": "PrintHead",
+      "name": "Print Head",
+      "type": "Printer"
+    },
+    {
+      "component_id": "TampCylinder",
+      "name": "Tamp Cylinder",
+      "type": "Actuator"
+    },
+    {
+      "component_id": "TampSensor",
+      "name": "Tamp Sensor",
+      "type": "Sensor"
+    }
+  ],
+  "dependencies": [
+    ["ProductSensor", "PrintHead"],
+    ["PrintHead", "TampCylinder"],
+    ["TampCylinder", "TampSensor"]
+  ]
+}

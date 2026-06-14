@@ -293,3 +293,110 @@ Cycle 1
 - average cycle duration
 - average relationship lag
 - trend direction and slope over cycles
+
+## Machine Topology
+
+Machine Topology represents component structure independently from event timing,
+cycle context, and evidence:
+
+```text
+Machine
+├── Components
+├── Connections
+├── Dependencies
+└── Topology
+
+Events
+↓
+Relationships
+↓
+Cycles
+↓
+Evidence
+```
+
+Topology provides structural context only.
+
+### Topology File Tree
+
+```text
+config/
+└── topology.json
+
+linealert/topology/
+├── __init__.py
+├── component.py
+├── dependency.py
+├── topology.py
+└── validator.py
+
+linealert/tests/
+└── test_machine_topology.py
+```
+
+### Example Topology JSON
+
+```json
+{
+  "components": [
+    {
+      "component_id": "ProductSensor",
+      "name": "Product Sensor",
+      "type": "Sensor"
+    },
+    {
+      "component_id": "PrintHead",
+      "name": "Print Head",
+      "type": "Printer"
+    },
+    {
+      "component_id": "TampCylinder",
+      "name": "Tamp Cylinder",
+      "type": "Actuator"
+    },
+    {
+      "component_id": "TampSensor",
+      "name": "Tamp Sensor",
+      "type": "Sensor"
+    }
+  ],
+  "dependencies": [
+    ["ProductSensor", "PrintHead"],
+    ["PrintHead", "TampCylinder"],
+    ["TampCylinder", "TampSensor"]
+  ]
+}
+```
+
+### Example Validation Report
+
+```json
+{
+  "component_count": 4,
+  "dependency_count": 3,
+  "missing_components": [],
+  "orphan_components": [],
+  "circular_dependencies": [],
+  "disconnected_chains": [],
+  "observations": []
+}
+```
+
+Topology validation detects structural observations only:
+
+- missing components
+- orphan components
+- circular dependencies
+- disconnected chains
+
+### Example Topology Visualization
+
+```text
+ProductSensor
+  ↓
+PrintHead
+  ↓
+TampCylinder
+  ↓
+TampSensor
+```
