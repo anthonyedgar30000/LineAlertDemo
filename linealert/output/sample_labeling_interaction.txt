@@ -1,0 +1,37 @@
+LineAlert Labeling Guide Interaction
+====================================
+User reports: "Label alignment is off"
+
+Matched Symptom: Label Alignment is Off
+
+Relevant Checks:
+- Peel tip square to bottle?
+- Is bottle stable during application?
+- Are guide rings centered?
+- Is issue constant or intermittent?
+- Does issue worsen at higher speed?
+
+Recommended Actions:
+- Adjust Peel Angle
+- Adjust Hold Down
+- Check Guide Rings
+- Increase Label Delay
+- Reduce Speed Temporarily
+
+Related Symptoms if Problem Persists:
+- Bubbles on Labels: Insufficient pressure time or unstable contact can create both bubbles and alignment errors.
+
+Escalation Guidance:
+- Issue continues after all adjustments.
+- Multiple issues are occurring at the same time.
+- Mechanical damage or worn parts are observed.
+- Unusual noises or air leaks are present.
+- Need replacement parts.
+
+Key Adjustment Areas:
+- Peel Angle: Peel plate angle setting
+- Hold Down: Hold-down pressure or position
+- Guide Rings: Product guidance
+- Label Delay: Timing of label application
+
+Key Point: Alignment problems are usually caused by geometry, stability, or timing offset.

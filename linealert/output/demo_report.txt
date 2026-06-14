@@ -1,0 +1,81 @@
+=========================
+LINEALERT REPORT
+=========================
+
+Issue
+-----
+Reported issue: "Label Alignment Off"
+Matched guide symptom: Label Alignment is Off
+
+Observed Evidence
+-----------------
+- User-entered issue text: Label Alignment Off
+- Guide evidence: issue matched symptom 'Label Alignment is Off'; examples include Crooked label; Rotated label; Inconsistent placement; Drifting placement; Skewed left/right.
+- Timing evidence: 8 aggregated metric(s) from 11 lag observation(s).
+- Drift evidence: 1 threshold violation(s) across 4 baseline-matched finding(s).
+- Topology evidence: 1 first-drift finding(s).
+- Hypothesis evidence: 3 ranked candidate(s).
+
+Timing Findings
+---------------
+- cycle:PrintComplete: 60.00s average from 2 sample(s).
+- cycle:ProductTransfer: 60.00s average from 2 sample(s).
+- cycle:TampExtend: 60.00s average from 2 sample(s).
+- cycle:TampRequest: 60.00s average from 2 sample(s).
+- lag:PrintComplete->TampRequest: 1.00s average from 3 sample(s).
+- lag:ProductTransfer->PrintComplete: 52.00s average from 2 sample(s).
+- lag:TampExtend->ProductTransfer: 5.00s average from 3 sample(s).
+- lag:TampRequest->TampExtend: 2.00s average from 3 sample(s).
+
+Drift Findings
+--------------
+- cycle:PrintComplete: actual 60.00s, baseline 60.00s, drift +0.00s, threshold +/-3.00s [within threshold].
+- lag:PrintComplete->TampRequest: actual 1.00s, baseline 1.00s, drift +0.00s, threshold +/-0.50s [within threshold].
+- lag:TampExtend->ProductTransfer: actual 5.00s, baseline 3.00s, drift +2.00s, threshold +/-1.00s [VIOLATION].
+- lag:TampRequest->TampExtend: actual 2.00s, baseline 2.00s, drift +0.00s, threshold +/-0.50s [within threshold].
+
+Topology Findings
+-----------------
+- Likely fault region: TampExtend subsystem; Delay first appears after TampExtend.
+  Evidence: lag:TampExtend->ProductTransfer: actual 5.00s, baseline 3.00s, drift +2.00s
+
+Candidate Hypotheses
+--------------------
+1. Cylinder sticking (Confidence: High, Score: 100.0)
+   Evidence: rule_match 30.0/30.0; threshold_violation 20.0/20.0; drift_severity 20.0/20.0; topology_region_match 20.0/20.0; timing_sample_support 10.0/10.0
+2. Air pressure issue (Confidence: Medium, Score: 65.0)
+   Evidence: rule_match 25.0/25.0; threshold_violation 15.0/15.0; drift_severity 15.0/15.0; timing_sample_support 10.0/10.0
+3. Sensor fault (Confidence: Low, Score: 35.0)
+   Evidence: rule_match 15.0/15.0; threshold_violation 10.0/10.0; drift_severity 5.0/5.0; timing_sample_support 5.0/5.0
+
+Guide Checks
+------------
+- Peel tip square to bottle? (Evidence: matched guide symptom 'Label Alignment is Off')
+- Is bottle stable during application? (Evidence: matched guide symptom 'Label Alignment is Off')
+- Are guide rings centered? (Evidence: matched guide symptom 'Label Alignment is Off')
+- Is issue constant or intermittent? (Evidence: matched guide symptom 'Label Alignment is Off')
+- Does issue worsen at higher speed? (Evidence: matched guide symptom 'Label Alignment is Off')
+
+Recommended Actions
+-------------------
+- Adjust Peel Angle (Evidence: matched guide symptom 'Label Alignment is Off'; relevant checks: Peel tip square to bottle?; Is bottle stable during application?; Are guide rings centered?; Is issue constant or intermittent?; Does issue worsen at higher speed?)
+- Adjust Hold Down (Evidence: matched guide symptom 'Label Alignment is Off'; relevant checks: Peel tip square to bottle?; Is bottle stable during application?; Are guide rings centered?; Is issue constant or intermittent?; Does issue worsen at higher speed?)
+- Check Guide Rings (Evidence: matched guide symptom 'Label Alignment is Off'; relevant checks: Peel tip square to bottle?; Is bottle stable during application?; Are guide rings centered?; Is issue constant or intermittent?; Does issue worsen at higher speed?)
+- Increase Label Delay (Evidence: matched guide symptom 'Label Alignment is Off'; relevant checks: Peel tip square to bottle?; Is bottle stable during application?; Are guide rings centered?; Is issue constant or intermittent?; Does issue worsen at higher speed?)
+- Reduce Speed Temporarily (Evidence: matched guide symptom 'Label Alignment is Off'; relevant checks: Peel tip square to bottle?; Is bottle stable during application?; Are guide rings centered?; Is issue constant or intermittent?; Does issue worsen at higher speed?)
+
+Escalation Guidance
+-------------------
+- Issue continues after all adjustments. (Evidence: guide escalation criteria for 'Label Alignment is Off')
+- Multiple issues are occurring at the same time. (Evidence: guide escalation criteria for 'Label Alignment is Off')
+- Mechanical damage or worn parts are observed. (Evidence: guide escalation criteria for 'Label Alignment is Off')
+- Unusual noises or air leaks are present. (Evidence: guide escalation criteria for 'Label Alignment is Off')
+- Need replacement parts. (Evidence: guide escalation criteria for 'Label Alignment is Off')
+
+Reasoning Summary
+-----------------
+LineAlert used deterministic rule lookup and measured evidence only.
+The reported issue 'Label Alignment Off' matched guide symptom 'Label Alignment is Off', which selected the checks and actions.
+Timing and baseline comparison produced 1 threshold violation(s).
+Topology placed the first drift at TampExtend -> ProductTransfer, supporting TampExtend subsystem.
+The top hypothesis is 'Cylinder sticking' because its score is backed by: rule_match 30.0/30.0; threshold_violation 20.0/20.0; drift_severity 20.0/20.0; topology_region_match 20.0/20.0; timing_sample_support 10.0/10.0
