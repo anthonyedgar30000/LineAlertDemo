@@ -1,0 +1,35 @@
+SITUATION ASSESSMENT
+
+Assessment ID:
+demo-slowtamp-production-assessment
+
+Machine State:
+Production
+
+Status:
+Significant Deviation
+
+Situation Summary:
+- Cycles observed: 12
+- Cycles out of baseline: 12
+- Percent affected: 100%
+
+Observed Conditions:
+- Tamp Extension Lag exceeded baseline
+- Average measured lag 1100 ms
+- Baseline lag 600 ms
+- Average deviation 83.333%
+- 12 of 12 cycles exceeded baseline
+- Topology validation passed
+
+Affected Components:
+- Tamp Cylinder
+
+Topology Integrity:
+Valid
+
+Confidence:
+0.950
+
+No diagnosis or root-cause determination performed.
+No maintenance recommendations generated.
