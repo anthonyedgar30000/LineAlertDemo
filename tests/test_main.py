@@ -7,7 +7,12 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
-from applications.linealert import AlertLine, build_demo_alerts, render_alerts
+from applications.linealert import (
+    build_demo_cycle,
+    calculate_timing_analysis,
+    classify_drift,
+    render_linealert_report,
+)
 from contextos import ContextRequest, ContextRouter
 from main import build_application_registry, main, run_contextos_request
 
@@ -21,53 +26,41 @@ FORBIDDEN_DEMO_TERMS = (
 
 
 class RenderAlertsTests(unittest.TestCase):
-    def test_labels_share_the_same_separator_column(self) -> None:
-        output = render_alerts(
-            [
-                AlertLine("A", "short label"),
-                AlertLine("Medium", "medium label"),
-                AlertLine("Much longer label", "long label"),
-            ]
-        )
+    def test_demo_cycle_has_expected_timing_drift(self) -> None:
+        timing = calculate_timing_analysis(build_demo_cycle())
 
-        rows = output.splitlines()[2:]
-        separator_columns = {row.index(":") for row in rows}
+        self.assertEqual(timing.expected_lag_ms, 100)
+        self.assertEqual(timing.observed_lag_ms, 153)
+        self.assertEqual(timing.delta_ms, 53)
+        self.assertEqual(classify_drift(timing.delta_ms), "Moderate Drift")
 
-        self.assertEqual(separator_columns, {len("Much longer label") + 1})
+    def test_label_alignment_issue_demo_contains_investigation_package(self) -> None:
+        output = render_linealert_report("Label Alignment Off")
 
-    def test_label_alignment_issue_demo_contains_expected_rows(self) -> None:
-        output = render_alerts(
-            build_demo_alerts("Label Alignment Off"),
-            title="LineAlert Report",
-        )
-
-        self.assertIn("LineAlert Report", output)
-        self.assertIn("Issue              : Label Alignment Off", output)
-        self.assertIn("Asset              : Label Applicator Station", output)
-        self.assertIn(
-            "Observed Condition : Label placement drift detected",
-            output,
-        )
-        self.assertIn(
-            "Expected State     : Label applied within alignment tolerance",
-            output,
-        )
-        self.assertIn(
-            "Observed State     : Label position outside expected tolerance window",
-            output,
-        )
-        self.assertIn(
-            "Likely Layer       : Mechanical alignment / sensor timing",
-            output,
-        )
-        self.assertIn(
-            "Recommended Action : Inspect label guide, tamp alignment, and sensor timing before rebaseline",
-            output,
-        )
-        self.assertIn(
-            "Escalation         : Operator Lead if repeated after adjustment",
-            output,
-        )
+        self.assertIn("LineAlert Investigation Package", output)
+        self.assertIn("Machine\nBottle Labeling Machine", output)
+        self.assertIn("Issue\nLabel Alignment Off", output)
+        self.assertIn("Observed Evidence", output)
+        self.assertIn("- 2026-06-14T05:16:00.240Z Tamp Extend", output)
+        self.assertIn("- 2026-06-14T05:16:00.393Z Label Applied", output)
+        self.assertIn("Expected State", output)
+        self.assertIn("Tamp Extend -> Label Applied within 100 ms", output)
+        self.assertIn("Observed State", output)
+        self.assertIn("Tamp Extend -> Label Applied in 153 ms", output)
+        self.assertIn("Relationship Analysis", output)
+        self.assertIn("Timing Analysis", output)
+        self.assertIn("- Delta: +53 ms", output)
+        self.assertIn("Drift Analysis", output)
+        self.assertIn("- Moderate Drift: 31-75 ms delta (observed)", output)
+        self.assertIn("Candidate Hypotheses", output)
+        self.assertIn("1. Label guide loosened", output)
+        self.assertIn("2. Tamp pad wear", output)
+        self.assertIn("3. Product positioning variance", output)
+        self.assertIn("4. Sensor contamination", output)
+        self.assertIn("Recommended Actions", output)
+        self.assertIn("Escalation Guidance", output)
+        self.assertIn("Confidence Assessment", output)
+        self.assertIn("Tradeoff Summary", output)
         for term in FORBIDDEN_DEMO_TERMS:
             self.assertNotIn(term, output)
 
@@ -84,9 +77,10 @@ class RenderAlertsTests(unittest.TestCase):
         self.assertIn("decision", output)
         self.assertIn("Proceed", output)
         self.assertIn("Application Output:", output)
-        self.assertIn("LineAlert Report", output)
+        self.assertIn("LineAlert Investigation Package", output)
+        self.assertIn("- Delta: +53 ms", output)
         self.assertIn(
-            "Recommended Action : Inspect label guide, tamp alignment, and sensor timing before rebaseline",
+            "1. Inspect and secure the label guide before changing timing parameters.",
             output,
         )
         for term in FORBIDDEN_DEMO_TERMS:
@@ -112,9 +106,10 @@ class RenderAlertsTests(unittest.TestCase):
         self.assertEqual(response.confidence, "Medium-high")
         self.assertIsNotNone(response.application_output)
         self.assertIn(
-            "Recommended Action : Inspect label guide, tamp alignment, and sensor timing before rebaseline",
+            "LineAlert Investigation Package",
             response.application_output,
         )
+        self.assertIn("- Delta: +53 ms", response.application_output)
         for term in FORBIDDEN_DEMO_TERMS:
             self.assertNotIn(term, response.application_output)
 
