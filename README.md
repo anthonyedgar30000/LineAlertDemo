@@ -867,3 +867,132 @@ No diagnosis or root-cause determination performed.
 No maintenance recommendations generated.
 No predictions generated.
 ```
+
+## Observation Confidence
+
+Observation Confidence evaluates the strength and trustworthiness of
+observations using explicit evidence-based factors.
+
+```text
+Events
+↓
+Cycles
+↓
+Relationships
+↓
+Dependency Chains
+↓
+Baseline Analysis
+↓
+Topology Integrity
+↓
+Configuration Provenance
+↓
+Evidence Collection
+↓
+Evidence Fusion
+↓
+Historical Context
+↓
+Situation Assessment
+```
+
+Confidence is observation-only. It does not diagnose, infer root cause,
+recommend maintenance, choose corrective actions, predict outcomes, or perform
+AI reasoning.
+
+### Observation Confidence File Tree
+
+```text
+linealert/confidence/
+├── __init__.py
+├── confidence_engine.py
+├── confidence_model.py
+├── factors.py
+├── report.py
+└── scoring.py
+
+linealert/tests/
+└── test_confidence.py
+```
+
+### Confidence Factors
+
+The confidence engine emits explicit factors:
+
+- Supporting Evidence
+- Historical Persistence
+- Multi-Source Confirmation
+- Topology Validation
+- Configuration Validity
+
+### Confidence Classifications
+
+- Very Low
+- Low
+- Moderate
+- High
+- Very High
+
+### Example Confidence JSON
+
+```json
+{
+  "observation": "Tamp Extension Lag Exceeded Baseline",
+  "confidence": 0.95,
+  "classification": "Very High",
+  "factors": [
+    {
+      "name": "Supporting Evidence",
+      "description": "6 supporting evidence item(s) across 2 observation cluster(s)",
+      "contribution": 0.22
+    },
+    {
+      "name": "Historical Persistence",
+      "description": "Observed across 42 occurrence(s); 12 consecutive cycle(s); 42 recurrence observation(s)",
+      "contribution": 0.2
+    },
+    {
+      "name": "Multi-Source Confirmation",
+      "description": "3 supporting evidence source(s)",
+      "contribution": 0.2
+    },
+    {
+      "name": "Topology Validation",
+      "description": "Topology=Valid; RelationshipIntegrity=Valid; DependencyChains=Healthy",
+      "contribution": 0.15
+    },
+    {
+      "name": "Configuration Validity",
+      "description": "BaselineValid=True; ConfigurationProvenance=Valid; ConfigurationDriftPresent=False",
+      "contribution": 0.15
+    }
+  ]
+}
+```
+
+### Human-Readable Confidence Report
+
+```text
+OBSERVATION CONFIDENCE
+
+Observation:
+Tamp Extension Lag Exceeded Baseline
+
+Confidence:
+0.950
+
+Classification:
+Very High
+
+Supporting Factors:
+- 6 supporting evidence item(s) across 2 observation cluster(s)
+- Observed across 42 occurrence(s); 12 consecutive cycle(s); 42 recurrence observation(s)
+- 3 supporting evidence source(s)
+- Topology=Valid; RelationshipIntegrity=Valid; DependencyChains=Healthy
+- BaselineValid=True; ConfigurationProvenance=Valid; ConfigurationDriftPresent=False
+
+No diagnosis or root-cause determination performed.
+No maintenance recommendations generated.
+No predictions generated.
+```
