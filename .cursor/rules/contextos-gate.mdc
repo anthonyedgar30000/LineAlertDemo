@@ -273,3 +273,27 @@ Pull Request Scope:
 ```
 
 Failure to distinguish scope levels is considered reporting ambiguity.
+
+## 14. Target Validation
+
+Before modifying a file, the AI must classify the target as:
+
+### Explicit Target
+
+The user directly named the file.
+
+### Contextual Target
+
+The file was inferred from prior conversation context.
+
+### Assumed Target
+
+The file was selected based on the AI's interpretation.
+
+For governance, security, architecture, infrastructure, or policy files:
+
+- Explicit Target = Proceed
+- Contextual Target = Proceed with Warning
+- Assumed Target = Request Confirmation
+
+The AI must report the target classification before modifying the file.
