@@ -1,0 +1,9 @@
+{
+  "cycle_time_ms": 5000,
+  "fault_mode": "Normal",
+  "jitter_ms": 50,
+  "drift_per_cycle_ms": 10,
+  "slow_tamp_delay_ms": 500,
+  "random_seed": 7,
+  "start_time": "2026-06-14T10:00:00Z"
+}
