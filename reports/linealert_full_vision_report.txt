@@ -1,0 +1,383 @@
+ContextOS Governed Response
+===========================
+
+ContextOS Envelope:
+request_id       : 6142e449-fcfe-4eab-b798-e7cb47a20019
+source_app       : ContextOS
+target_app       : LineAlertDemo
+user_intent      : Label Alignment Off
+operation_scope  : demo
+evidence         : ContextOS matched intent 'Label Alignment Off' to registered application 'LineAlertDemo'
+assumptions      : Registered application mapping is safe to invoke locally
+decision         : Proceed
+confidence       : Medium-high
+tradeoff_summary : Registered intent proceeds through the selected application; policy remains limited to explicit registry mappings
+
+Application Output:
+Machine Context
+===============
+
+Machine:
+Bottle Labeling Machine
+
+Purpose:
+Apply printed labels to bottles moving on a conveyor.
+
+Physical Components
+
+Conveyor
+- Moves bottles through the labeling station.
+
+Product Detect Sensor
+- Detects bottle arrival.
+- Starts the labeling sequence.
+
+Print Engine
+- Generates or confirms label print completion.
+
+Label Feed Assembly
+- Advances label stock into position.
+
+Label Ready Sensor
+- Confirms the label is available for application.
+
+Tamp Cylinder
+- Extends the tamp mechanism toward the bottle.
+
+Tamp Pad
+- Contacts or transfers the label onto the bottle surface.
+
+Label Applied Sensor
+- Confirms the label application event.
+
+Tamp Home Sensor
+- Confirms the tamp mechanism returned to home position.
+
+Controller
+- Coordinates machine sequence and timing.
+
+Expected Interaction Model
+
+Bottle Detect
+->
+Print Complete
+->
+Label Ready
+->
+Tamp Extend
+->
+Label Applied
+->
+Tamp Home
+
+Interaction Explanation
+During a normal cycle, the conveyor presents a bottle to the product detect sensor. The controller coordinates print completion, label feed readiness, tamp extension, label application confirmation, and tamp return before the next bottle is processed.
+
+Monitored Relationships
+- Bottle Detect -> Print Complete
+- Print Complete -> Label Ready
+- Label Ready -> Tamp Extend
+- Tamp Extend -> Label Applied
+- Label Applied -> Tamp Home
+
+LineAlert Investigation Package
+===============================
+
+Machine
+Bottle Labeling Machine
+
+Issue
+Label Alignment Off
+
+Observed Evidence
+- 2026-06-14T05:16:00.000Z Bottle Detect
+- 2026-06-14T05:16:00.072Z Print Complete
+- 2026-06-14T05:16:00.118Z Label Ready
+- 2026-06-14T05:16:00.240Z Tamp Extend
+- 2026-06-14T05:16:00.393Z Label Applied
+- 2026-06-14T05:16:00.520Z Tamp Home
+- Tamp Extend observed at 240 ms
+- Label Applied observed at 393 ms
+- Observed lag calculated from deterministic cycle data
+
+Simulated Full-Vision Evidence Package
+======================================
+Simulation Mode:
+Enabled for deterministic demo; evidence represents what a connected LineAlert deployment would package from operators, maintenance, cameras, handheld tools, and inline sensors.
+
+Vision Measurement Evidence
+---------------------------
+- Failed bottle sample: horizontal offset +3.2 mm, vertical offset +0.6 mm, skew angle 2.4 degrees.
+- Alignment tolerance: +/-1.5 mm horizontal, +/-1.0 degree skew.
+- Good comparison bottle after adjustment: horizontal offset +0.4 mm, skew angle 0.3 degrees.
+- 10-bottle validation sample after guide adjustment: 10/10 bottles within tolerance.
+
+Picture Evidence
+----------------
+- operator_failed_label_001.jpg: label visibly skewed right; linked hypothesis: Label guide loosened; evidence strength: High.
+- maintenance_guide_clamp_before.jpg: guide clamp visibly loose and guide ring offset; linked hypothesis: Label guide loosened; evidence strength: High.
+- maintenance_tamp_pad_before.jpg: minor tamp pad wear, no residue buildup; linked hypothesis: Tamp pad wear; evidence strength: Low.
+- sensor_face_before.jpg: label-applied sensor face clean; linked hypothesis: Sensor contamination; evidence strength: Low.
+- validation_10_bottle_after.jpg: post-adjustment bottles within alignment tolerance; linked hypothesis: Label guide loosened; evidence strength: High.
+
+Operator Feedback Evidence
+--------------------------
+- Operator observed label skew after changeover: yes.
+- Operator observed product wobble: no.
+- Operator heard abnormal tamp motion: no.
+- Operator confidence: medium-high because skew pattern repeated before guide adjustment.
+
+Maintenance Feedback Evidence
+-----------------------------
+- Label guide checked: yes.
+- Guide clamp condition: loose.
+- Guide ring position: offset toward outboard side.
+- Corrective action: guide secured and guide ring realigned.
+- Result after action: alignment restored during 10-bottle validation sample.
+
+Inline Sensor Evidence
+----------------------
+- Digital PSI gauge at tamp line: 71 psi steady; expected range 68-75 psi.
+- Mechanical clicker at Tamp Extend: triggered on all 10 validation cycles.
+- Mechanical clicker at Tamp Home: triggered on all 10 validation cycles.
+- Conveyor RPM sensor: 142 RPM, stable within +/-1.0%.
+- Label feed roller RPM sensor: 142 RPM, matched conveyor ratio within +/-1.0%.
+- Label feed motor load sensor: 1.1 A average, no binding spike.
+- Label feed motor heat sensor: 54 C, within normal range.
+
+Handheld Diagnostic Tool Evidence
+---------------------------------
+- Digital calipers: guide ring offset measured at +2.0 mm before correction and +0.2 mm after correction.
+- Handheld tachometer: conveyor and label feed rollers matched target speed.
+- Digital pressure gauge: tamp pressure remained within tolerance during actuation.
+- Clamp meter: label feed motor current stayed within baseline range.
+- IR thermometer: label feed motor temperature remained within normal range.
+- Handheld signal tester: label-applied sensor transition clean after guide adjustment.
+
+Expected State
+Tamp Extend -> Label Applied within 100 ms
+
+Observed State
+Tamp Extend -> Label Applied in 153 ms
+
+Relationship Analysis
+- Expected relationship: Tamp Extend precedes Label Applied by 100 ms
+- Observed relationship: Tamp Extend precedes Label Applied by 153 ms
+- Relationship integrity: Sequence valid; timing relationship shows moderate drift
+
+Timing Analysis
+- Expected lag: 100 ms
+- Observed lag: 153 ms
+- Delta: +53 ms
+
+Drift Analysis
+- No Drift: 0-10 ms delta
+- Minor Drift: 11-30 ms delta
+- Moderate Drift: 31-75 ms delta (observed)
+- Severe Drift: >75 ms delta
+
+Temporal Reasoning
+==================
+Sequence validity: Valid
+Expected event order: Bottle Detect -> Print Complete -> Label Ready -> Tamp Extend -> Label Applied -> Tamp Home
+Observed event order: Bottle Detect -> Print Complete -> Label Ready -> Tamp Extend -> Label Applied -> Tamp Home
+Timing deviation: +53 ms on Tamp Extend -> Label Applied
+Confidence score: 0.86
+Evidence used:
+- Expected lag 100 ms
+- Observed lag 153 ms
+- Deterministic cycle timestamps preserve event order
+- Simulated vision validation shows alignment restored after guide correction
+
+Topological Reasoning
+=====================
+Machine components involved: Product Detect Sensor, Label Feed Assembly, Tamp Cylinder, Tamp Pad, Label Applied Sensor, Controller
+Component relationship affected: Tamp Extend -> Label Applied
+Upstream/downstream dependency interpretation: upstream detection and label-ready events completed in order; the deviation appears downstream at the tamp-to-application relationship.
+Confidence score: 0.74
+Evidence used:
+- Bottle Detect, Print Complete, and Label Ready occurred before Tamp Extend
+- Label Applied followed Tamp Extend but exceeded the expected lag
+- Monitored relationship identifies the affected transfer-stage edge
+- Simulated inline PSI, RPM, motor load, and sensor checks reduce support for pneumatic, speed, load, and sensor faults
+
+Constraint Reasoning
+====================
+Expected timing tolerance: Tamp Extend -> Label Applied within 100 ms
+Observed violation: observed lag 153 ms
+Drift threshold crossed: Moderate Drift (+53 ms)
+Confidence score: 0.82
+Evidence used:
+- Expected lag 100 ms
+- Observed lag 153 ms
+- Delta +53 ms falls in the Moderate Drift band
+- Simulated guide correction brings 10-bottle validation sample back within alignment tolerance
+
+Transitive Reasoning
+====================
+Derived relationship chain: Bottle Detect -> Label Ready -> Tamp Extend -> Label Applied
+Downstream symptom can plausibly originate upstream: yes; bottle presentation or label readiness issues can propagate to tamp transfer, but current evidence localizes the measured deviation at Tamp Extend -> Label Applied.
+Confidence score: 0.76
+Evidence used:
+- Bottle Detect precedes Label Ready
+- Label Ready precedes Tamp Extend
+- Tamp Extend precedes delayed Label Applied
+- Simulated bottle stop and conveyor speed evidence reduces upstream product-position support
+
+Abductive Hypothesis Ranking
+============================
+1. Hypothesis: Label guide loosened
+   Confidence score: 0.94
+   Supporting evidence:
+   - Observed +53 ms moderate drift at the transfer-stage relationship.
+   - Event order remains valid, which points away from a sequence-control fault.
+   - Peter guide ranks label guide inspection as the first workflow step.
+   - Simulated operator photo shows label skew matching guide-side drift.
+   - Simulated maintenance photo shows loose guide clamp and guide ring offset.
+   - Simulated post-adjustment vision sample shows 10/10 bottles within tolerance.
+   Contradicting evidence:
+   - Inline PSI, RPM, motor load, and sensor checks are within tolerance.
+   - Tamp pad inspection shows only minor wear and no residue buildup.
+   Reasoning rationale: The simulated visual, maintenance, and post-adjustment validation evidence directly aligns with a guide-position fault while other subsystem checks remain within tolerance.
+   Missing context:
+   - Longer production-run validation after the 10-bottle sample
+   - Historical trend showing when guide position began drifting
+   Recommended validation step: Keep the guide secured, run an extended sample, and monitor whether alignment and timing remain within tolerance.
+
+2. Hypothesis: Tamp pad wear
+   Confidence score: 0.36
+   Supporting evidence:
+   - Observed +53 ms moderate drift between tamp extension and label application.
+   - The affected relationship includes the tamp transfer stage.
+   Contradicting evidence:
+   - Simulated tamp pad photo shows only minor wear and no residue buildup.
+   - Inline PSI and clicker evidence indicate normal tamp actuation.
+   - Post-guide-adjustment validation restores alignment without pad replacement.
+   Reasoning rationale: Tamp pad wear remains mechanically possible, but simulated inspection and post-adjustment results make it less likely than guide looseness.
+   Missing context:
+   - Long-term tamp pad wear trend
+   - Pad durometer measurement
+   Recommended validation step: Recheck tamp pad condition if alignment drift returns after guide validation.
+
+3. Hypothesis: Product positioning variance
+   Confidence score: 0.31
+   Supporting evidence:
+   - Bottle presentation occurs upstream of the delayed label application event.
+   - Position variance could make tamp contact less repeatable.
+   Contradicting evidence:
+   - Simulated caliper sample shows bottle stop repeatability within tolerance.
+   - Simulated conveyor RPM remains stable during failed and corrected samples.
+   - Post-guide-adjustment validation restores alignment without product-stop changes.
+   Reasoning rationale: Upstream positioning can propagate downstream, but the simulated bottle position and conveyor evidence does not support it as the primary cause.
+   Missing context:
+   - Larger bottle-position sample across multiple SKUs
+   - Changeover fixture inspection record
+   Recommended validation step: Continue monitoring bottle stop repeatability during the extended validation run.
+
+4. Hypothesis: Sensor contamination
+   Confidence score: 0.24
+   Supporting evidence:
+   - The delayed observed state depends on Label Applied sensor confirmation.
+   - Sensor contamination could delay readiness or applied-state detection.
+   Contradicting evidence:
+   - Simulated sensor photo shows a clean label-applied sensor face.
+   - Simulated handheld signal tester shows clean sensor transitions.
+   - No missing, reordered, or bouncing sensor events appear in the cycle trace.
+   Reasoning rationale: Sensor contamination is weakly supported because simulated visual and electrical checks show normal sensor condition and transitions.
+   Missing context:
+   - Longer sensor-transition trend under production vibration
+   - Electrical noise capture during peak line speed
+   Recommended validation step: Retest sensor transitions only if drift returns without guide movement.
+
+Root Cause Status:
+Confirmed in simulated evidence package
+
+Most Likely Explanation:
+Label guide loosened
+
+Why:
+Highest evidence alignment based on timing drift, preserved event sequence, simulated guide-clamp photo evidence, guide offset measurement, and post-adjustment validation.
+
+Reasoning Summary
+=================
+- Most likely explanation: Label guide loosened
+- Confidence score: 0.94
+- Why this is not absolute certainty: simulated evidence is deterministic demo data and still needs longer production-run validation.
+- What evidence would confirm it: loose guide found during inspection and alignment restored after securing the guide.
+- What evidence would falsify it: guide inspection passes while drift persists after controlled bottle and tamp-pad checks.
+- Next best troubleshooting step: Inspect Label Guide
+
+Candidate Hypotheses
+1. Label guide loosened - highest ranked possibility; could shift label path before tamp contact.
+2. Tamp pad wear - could reduce consistent label transfer and add application delay.
+3. Product positioning variance - could change bottle presentation during tamp extension.
+4. Sensor contamination - could delay readiness or applied-state confirmation.
+
+Peter Troubleshooting Guide
+===========================
+Guide: Peter Label Alignment Guide
+Issue: Label Alignment Off
+
+Prioritized Workflow
+====================
+1. Inspect Label Guide - Check the label guide for looseness or misalignment.
+2. Inspect Tamp Pad - Check tamp pad condition and label transfer consistency.
+3. Verify Product Stop Position - Check bottle presentation and stop repeatability.
+4. Inspect Sensors - Check readiness and applied-state sensor transitions.
+
+Troubleshooting Workflow
+========================
+
+Guide:
+Peter Label Alignment Guide
+
+Current Recommended Starting Step:
+Inspect Label Guide
+
+Reason:
+Highest ranked hypothesis:
+Label guide loosened
+
+Supporting Evidence:
+- Expected lag 100 ms
+- Observed lag 153 ms
+- Drift +53 ms
+
+Verification Steps
+==================
+Verification Required:
+Run 10 bottles and confirm alignment within tolerance
+Confirm alignment restored
+
+Step Details:
+- Step 1: Inspect Label Guide
+  Pass: Continue to tamp pad inspection if alignment drift persists.
+  Fail: Secure and realign the label guide before rebaseline.
+  Verify: Run 10 bottles and confirm alignment within tolerance
+- Step 2: Inspect Tamp Pad
+  Pass: Continue to product stop position verification.
+  Fail: Clean or replace tamp pad before rebaseline.
+  Verify: Observe consistent label transfer
+- Step 3: Verify Product Stop Position
+  Pass: Continue to sensor inspection.
+  Fail: Stabilize bottle stop position before rebaseline.
+  Verify: Measure bottle stop repeatability
+- Step 4: Inspect Sensors
+  Pass: Document results and monitor next production run.
+  Fail: Clean and validate sensors before rebaseline.
+  Verify: Sensor transitions occur within expected timing window
+
+Recommended Actions
+1. Inspect and secure the label guide before changing timing parameters.
+2. Check tamp pad face condition and replace if wear or residue is observed.
+3. Verify bottle stop, spacing, and conveyor presentation at the applicator station.
+4. Clean and validate label-ready and applied-state sensors before rebaseline.
+
+Escalation Guidance
+Escalate to Operator Lead if moderate drift repeats after guide, tamp, and sensor checks.
+
+Confidence Assessment
+Medium-high: deterministic timing data shows a valid sequence with +53 ms drift; root cause is not confirmed.
+
+Tradeoff Summary
+Mechanical and sensor checks are low-risk first steps; changing timing baselines before inspection could mask the underlying cause.
