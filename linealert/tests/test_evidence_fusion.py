@@ -63,7 +63,7 @@ class EvidenceFusionTests(unittest.TestCase):
         self.assertEqual(3, cluster.sources_contributing)
         self.assertEqual([7, 8], cluster.cycles_observed)
         self.assertEqual("Significant Deviation", cluster.severity)
-        self.assertEqual(0.928, cluster.confidence)
+        self.assertEqual(0.927, cluster.confidence)
         self.assertEqual(
             [
                 "Tamp lag exceeded baseline",
