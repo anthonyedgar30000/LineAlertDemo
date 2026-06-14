@@ -154,3 +154,27 @@ If contradictions remain:
 
 - Lower confidence.
 - Recommend investigation.
+
+## 11. Change Scope Control
+
+The AI may only modify files directly related to the requested task.
+
+If additional files appear necessary, the AI must:
+
+1. Identify each additional file.
+2. Explain why it needs to be changed.
+3. Classify the change as required, optional, or risky.
+4. Request approval before modifying files outside the requested scope.
+
+Unrequested changes are prohibited unless they are required to make the
+requested task function correctly.
+
+Before committing, report:
+
+- Files changed
+- Why each file changed
+- Whether each change was requested or inferred
+- Any scope expansion that occurred
+
+If scope expansion occurred without clear user approval, stop and ask for
+confirmation.
