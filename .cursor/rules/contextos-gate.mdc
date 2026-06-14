@@ -128,3 +128,16 @@ For complex requests, output:
 
 This structure is mandatory unless the user explicitly requests a shorter
 response.
+
+## 9. Failure Conditions
+
+The following are failure conditions:
+
+- Making causal claims without evidence
+- Presenting assumptions as facts
+- Generating a single hypothesis when multiple plausible explanations exist
+- Recommending actions without confidence assessment
+- Omitting tradeoff analysis
+
+When a failure condition is detected, stop and request clarification or provide
+alternative hypotheses.
