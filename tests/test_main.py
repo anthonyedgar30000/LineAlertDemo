@@ -88,6 +88,17 @@ class RenderAlertsTests(unittest.TestCase):
         self.assertIn("- Delta: +53 ms", output)
         self.assertIn("Drift Analysis", output)
         self.assertIn("- Moderate Drift: 31-75 ms delta (observed)", output)
+        self.assertIn("Temporal Reasoning", output)
+        self.assertIn("Sequence validity: Valid", output)
+        self.assertIn("Topological Reasoning", output)
+        self.assertIn("Component relationship affected: Tamp Extend -> Label Applied", output)
+        self.assertIn("Constraint Reasoning", output)
+        self.assertIn("Transitive Reasoning", output)
+        self.assertIn(
+            "Derived relationship chain: Bottle Detect -> Label Ready -> Tamp Extend -> Label Applied",
+            output,
+        )
+        self.assertIn("Abductive Hypothesis Ranking", output)
         self.assertIn("Candidate Hypotheses", output)
         self.assertIn("1. Label guide loosened", output)
         self.assertIn("2. Tamp pad wear", output)
@@ -111,6 +122,9 @@ class RenderAlertsTests(unittest.TestCase):
         self.assertIn("Recommended Actions", output)
         self.assertIn("Escalation Guidance", output)
         self.assertIn("Confidence Assessment", output)
+        self.assertIn("Root Cause Status:\nNot conclusively proven", output)
+        self.assertIn("Most Likely Explanation:\nLabel guide loosened", output)
+        self.assertIn("Reasoning Summary", output)
         self.assertIn("Tradeoff Summary", output)
         for component in PHYSICAL_COMPONENTS:
             self.assertIn(component, output)
@@ -118,6 +132,26 @@ class RenderAlertsTests(unittest.TestCase):
             self.assertIn(relationship, output)
         for term in FORBIDDEN_DEMO_TERMS:
             self.assertNotIn(term, output)
+
+    def test_reasoning_assessment_contains_confidence_and_evidence(self) -> None:
+        output = render_linealert_report("Label Alignment Off")
+
+        self.assertIn("Confidence score: 0.86", output)
+        self.assertIn("Confidence score: 0.78", output)
+        self.assertIn("Supporting evidence:", output)
+        self.assertIn(
+            "Observed +53 ms moderate drift at the transfer-stage relationship.",
+            output,
+        )
+        self.assertIn("Contradicting evidence:", output)
+        self.assertIn(
+            "No direct physical inspection result confirms guide looseness.",
+            output,
+        )
+        self.assertIn("Missing context:", output)
+        self.assertIn("Recommended validation step:", output)
+        self.assertIn("Root Cause Status:\nNot conclusively proven", output)
+        self.assertIn("Reasoning Summary\n=================", output)
 
     def test_troubleshooting_engine_ranks_peter_guide_from_hypotheses(self) -> None:
         engine = TroubleshootingEngine()
