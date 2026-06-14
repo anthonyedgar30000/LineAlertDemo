@@ -7,7 +7,14 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
-from main import AlertLine, build_demo_alerts, main, render_alerts, run_contextos_request
+from main import (
+    AlertLine,
+    build_demo_alerts,
+    evaluate_contextos_policy,
+    main,
+    render_alerts,
+    run_contextos_request,
+)
 
 
 class RenderAlertsTests(unittest.TestCase):
@@ -48,6 +55,31 @@ class RenderAlertsTests(unittest.TestCase):
         self.assertIn("Proceed", output)
         self.assertIn("LineAlert Output:", output)
         self.assertIn("Passenger guidance : Use the center display for reroutes", output)
+
+    def test_known_issue_policy_allows_line_alert_invocation(self) -> None:
+        decision = evaluate_contextos_policy("Label Alignment Off")
+
+        self.assertTrue(decision.may_invoke_line_alert)
+        self.assertEqual(decision.decision, "Proceed")
+        self.assertEqual(decision.confidence, "Medium-high")
+
+    def test_unknown_issue_policy_skips_line_alert_invocation(self) -> None:
+        output = run_contextos_request("Unexpected Platform Fire", request_id="test-request")
+
+        self.assertIn("decision         : Investigate Further", output)
+        self.assertIn("confidence       : Low", output)
+        self.assertIn(
+            "evidence         : ContextOS did not recognize issue "
+            "'Unexpected Platform Fire'; LineAlertDemo was not invoked",
+            output,
+        )
+        self.assertIn(
+            "assumptions      : No safe demo mapping exists for the requested issue",
+            output,
+        )
+        self.assertIn("LineAlert Output: SKIPPED", output)
+        self.assertIn("LineAlertDemo was not invoked by ContextOS policy.", output)
+        self.assertNotIn("Demo scenario loaded", output)
 
     def test_demo_cli_routes_through_contextos(self) -> None:
         buffer = io.StringIO()

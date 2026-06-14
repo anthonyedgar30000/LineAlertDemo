@@ -10,6 +10,7 @@ from uuid import uuid4
 
 
 DEFAULT_ISSUE = "Label Alignment Off"
+KNOWN_DEMO_ISSUES = frozenset({DEFAULT_ISSUE.casefold()})
 
 
 @dataclass(frozen=True)
@@ -33,6 +34,18 @@ class ContextOSEnvelope:
     assumptions: str
     decision: str
     confidence: str
+    tradeoff_summary: str
+
+
+@dataclass(frozen=True)
+class ContextOSPolicyDecision:
+    """Result of evaluating whether a LineAlertDemo request may execute."""
+
+    may_invoke_line_alert: bool
+    decision: str
+    confidence: str
+    evidence: str
+    assumptions: str
     tradeoff_summary: str
 
 
@@ -70,7 +83,45 @@ def render_alerts(alerts: Iterable[AlertLine], *, title: str = "Line Alert Demo"
     return "\n".join(rendered_rows)
 
 
-def build_contextos_envelope(issue: str, *, request_id: str | None = None) -> ContextOSEnvelope:
+def evaluate_contextos_policy(issue: str) -> ContextOSPolicyDecision:
+    """Decide whether the requested issue maps to a known safe demo."""
+
+    if issue.casefold() in KNOWN_DEMO_ISSUES:
+        return ContextOSPolicyDecision(
+            may_invoke_line_alert=True,
+            decision="Proceed",
+            confidence="Medium-high",
+            evidence=(
+                f"ContextOS recognized issue '{issue}' as a known LineAlertDemo scenario"
+            ),
+            assumptions="Known demo scenario is safe to invoke locally",
+            tradeoff_summary=(
+                "Known issue proceeds through LineAlertDemo; policy remains limited "
+                "to registered demo names"
+            ),
+        )
+
+    return ContextOSPolicyDecision(
+        may_invoke_line_alert=False,
+        decision="Investigate Further",
+        confidence="Low",
+        evidence=(
+            f"ContextOS did not recognize issue '{issue}'; LineAlertDemo was not invoked"
+        ),
+        assumptions="No safe demo mapping exists for the requested issue",
+        tradeoff_summary=(
+            "Skipping unknown issues avoids unsafe fallback behavior; new demos must "
+            "be registered before execution"
+        ),
+    )
+
+
+def build_contextos_envelope(
+    issue: str,
+    policy_decision: ContextOSPolicyDecision,
+    *,
+    request_id: str | None = None,
+) -> ContextOSEnvelope:
     """Build the governance envelope for a local LineAlertDemo invocation."""
 
     return ContextOSEnvelope(
@@ -79,21 +130,18 @@ def build_contextos_envelope(issue: str, *, request_id: str | None = None) -> Co
         target_app="LineAlertDemo",
         user_intent=issue,
         operation_scope="demo",
-        evidence=(
-            f"ContextOS received demo request for issue '{issue}'; "
-            "LineAlertDemo core renderer invoked locally"
-        ),
-        assumptions="Local adapter represents the ContextOS app boundary for this demo",
-        decision="Proceed",
-        confidence="Medium-high",
-        tradeoff_summary=(
-            "Small in-process adapter avoids external dependencies; full service "
-            "integration remains outside this demo"
-        ),
+        evidence=policy_decision.evidence,
+        assumptions=policy_decision.assumptions,
+        decision=policy_decision.decision,
+        confidence=policy_decision.confidence,
+        tradeoff_summary=policy_decision.tradeoff_summary,
     )
 
 
-def render_contextos_response(envelope: ContextOSEnvelope, line_alert_output: str) -> str:
+def render_contextos_response(
+    envelope: ContextOSEnvelope,
+    line_alert_output: str | None,
+) -> str:
     """Render a governed ContextOS response with the original LineAlert output."""
 
     envelope_rows = [
@@ -117,15 +165,27 @@ def render_contextos_response(envelope: ContextOSEnvelope, line_alert_output: st
     ]
 
     rendered_rows.extend(f"{label:<{label_width}} : {value}" for label, value in envelope_rows)
-    rendered_rows.extend(["", "LineAlert Output:", line_alert_output])
+    if line_alert_output is None:
+        rendered_rows.extend(
+            [
+                "",
+                "LineAlert Output: SKIPPED",
+                "LineAlertDemo was not invoked by ContextOS policy.",
+            ]
+        )
+    else:
+        rendered_rows.extend(["", "LineAlert Output:", line_alert_output])
     return "\n".join(rendered_rows)
 
 
 def run_contextos_request(issue: str, *, request_id: str | None = None) -> str:
     """Route a ContextOS request through LineAlertDemo and return a governed response."""
 
-    envelope = build_contextos_envelope(issue, request_id=request_id)
-    line_alert_output = render_alerts(build_demo_alerts(issue), title=issue)
+    policy_decision = evaluate_contextos_policy(issue)
+    envelope = build_contextos_envelope(issue, policy_decision, request_id=request_id)
+    line_alert_output = None
+    if policy_decision.may_invoke_line_alert:
+        line_alert_output = render_alerts(build_demo_alerts(issue), title=issue)
     return render_contextos_response(envelope, line_alert_output)
 
 
