@@ -7,15 +7,9 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
+from applications.linealert import AlertLine, build_demo_alerts, render_alerts
 from contextos import ContextRequest, ContextRouter
-from main import (
-    AlertLine,
-    build_application_registry,
-    build_demo_alerts,
-    main,
-    render_alerts,
-    run_contextos_request,
-)
+from main import build_application_registry, main, run_contextos_request
 
 
 class RenderAlertsTests(unittest.TestCase):
@@ -54,7 +48,7 @@ class RenderAlertsTests(unittest.TestCase):
         self.assertIn("LineAlertDemo", output)
         self.assertIn("decision", output)
         self.assertIn("Proceed", output)
-        self.assertIn("LineAlert Output:", output)
+        self.assertIn("Application Output:", output)
         self.assertIn("Passenger guidance : Use the center display for reroutes", output)
 
     def test_line_alert_is_registered_application(self) -> None:
@@ -62,7 +56,8 @@ class RenderAlertsTests(unittest.TestCase):
         application = registry.get_application("Label Alignment Off")
 
         self.assertIsNotNone(application)
-        self.assertEqual(application.name, "LineAlertDemo")
+        self.assertEqual(application.name(), "LineAlertDemo")
+        self.assertEqual(application.capabilities(), ("Label Alignment Off",))
 
     def test_contextos_router_selects_registered_line_alert_application(self) -> None:
         request = ContextRequest.create(
@@ -74,6 +69,7 @@ class RenderAlertsTests(unittest.TestCase):
         self.assertEqual(response.target_app, "LineAlertDemo")
         self.assertEqual(response.decision, "Proceed")
         self.assertEqual(response.confidence, "Medium-high")
+        self.assertIsNotNone(response.application_output)
         self.assertIn(
             "Passenger guidance : Use the center display for reroutes",
             response.application_output,
@@ -107,7 +103,7 @@ class RenderAlertsTests(unittest.TestCase):
         self.assertEqual(exit_code, 0)
         self.assertIn("ContextOS Governed Response", output)
         self.assertIn("ContextOS Envelope:", output)
-        self.assertIn("LineAlert Output:", output)
+        self.assertIn("Application Output:", output)
 
 
 if __name__ == "__main__":

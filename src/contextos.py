@@ -3,11 +3,24 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Callable
+from typing import Protocol, Sequence
 from uuid import uuid4
 
 
-ApplicationHandler = Callable[["ContextRequest"], str]
+class ApplicationAdapter(Protocol):
+    """ContextOS application contract."""
+
+    def name(self) -> str:
+        """Return the application name used in governed responses."""
+        ...
+
+    def capabilities(self) -> Sequence[str]:
+        """Return user intents this application can safely handle."""
+        ...
+
+    def execute(self, context_request: "ContextRequest") -> str:
+        """Execute the application for a governed ContextOS request."""
+        ...
 
 
 @dataclass(frozen=True)
@@ -90,34 +103,17 @@ class ContextResponse:
         return "\n".join(rendered_rows)
 
 
-@dataclass(frozen=True)
-class RegisteredApplication:
-    name: str
-    output_label: str
-    handler: ApplicationHandler
-
-
 class ApplicationRegistry:
     """Registry mapping user intents to executable applications."""
 
     def __init__(self) -> None:
-        self._applications_by_intent: dict[str, RegisteredApplication] = {}
+        self._applications_by_intent: dict[str, ApplicationAdapter] = {}
 
-    def register(
-        self,
-        *,
-        intent: str,
-        name: str,
-        handler: ApplicationHandler,
-        output_label: str,
-    ) -> None:
-        self._applications_by_intent[self._normalize_intent(intent)] = RegisteredApplication(
-            name=name,
-            output_label=output_label,
-            handler=handler,
-        )
+    def register(self, application: ApplicationAdapter) -> None:
+        for capability in application.capabilities():
+            self._applications_by_intent[self._normalize_intent(capability)] = application
 
-    def get_application(self, user_intent: str) -> RegisteredApplication | None:
+    def get_application(self, user_intent: str) -> ApplicationAdapter | None:
         return self._applications_by_intent.get(self._normalize_intent(user_intent))
 
     @staticmethod
@@ -155,16 +151,17 @@ class ContextRouter:
                 application_output=None,
             )
 
-        application_output = application.handler(request)
+        application_output = application.execute(request)
+        application_name = application.name()
         return ContextResponse(
             request_id=request.request_id,
             source_app=request.source_app,
-            target_app=application.name,
+            target_app=application_name,
             user_intent=request.user_intent,
             operation_scope=request.operation_scope,
             evidence=(
                 f"ContextOS matched intent '{request.user_intent}' to registered "
-                f"application '{application.name}'"
+                f"application '{application_name}'"
             ),
             assumptions="Registered application mapping is safe to invoke locally",
             decision="Proceed",
@@ -173,6 +170,6 @@ class ContextRouter:
                 "Registered intent proceeds through the selected application; policy "
                 "remains limited to explicit registry mappings"
             ),
-            application_output_label=application.output_label,
+            application_output_label="Application Output",
             application_output=application_output,
         )
