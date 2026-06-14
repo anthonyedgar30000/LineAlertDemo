@@ -90,9 +90,13 @@ class RenderAlertsTests(unittest.TestCase):
         self.assertIn("Maintenance Feedback Evidence", output)
         self.assertIn("Inline Sensor Evidence", output)
         self.assertIn("Handheld Diagnostic Tool Evidence", output)
+        self.assertIn("Configuration Change Evidence", output)
         self.assertIn("10-bottle validation sample after guide adjustment: 10/10 bottles within tolerance", output)
         self.assertIn("Guide clamp condition: loose.", output)
         self.assertIn("Digital PSI gauge at tamp line: 71 psi steady", output)
+        self.assertIn("Timing recipe checksum after rehoming: unchanged.", output)
+        self.assertIn("Label delay setting since last rehoming: unchanged at 100 ms.", output)
+        self.assertIn("no timing setting changed after rehoming, so a settings bug is unlikely", output)
         self.assertIn("Relationship Analysis", output)
         self.assertIn("Timing Analysis", output)
         self.assertIn("- Delta: +53 ms", output)
@@ -177,6 +181,7 @@ class RenderAlertsTests(unittest.TestCase):
         self.assertIn("Label feed motor heat sensor: 54 C, within normal range", output)
         self.assertIn("Digital calipers: guide ring offset measured at +2.0 mm before correction and +0.2 mm after correction", output)
         self.assertIn("Handheld signal tester: label-applied sensor transition clean after guide adjustment", output)
+        self.assertIn("Configuration audit shows no timing setting changed since last rehoming", output)
 
     def test_troubleshooting_engine_ranks_peter_guide_from_hypotheses(self) -> None:
         engine = TroubleshootingEngine()

@@ -132,6 +132,7 @@ def build_hypothesis_assessments(
                 f"Observed {drift_summary} at the transfer-stage relationship.",
                 "Event order remains valid, which points away from a sequence-control fault.",
                 "Peter guide ranks label guide inspection as the first workflow step.",
+                "Configuration audit shows no timing-setting change since last rehoming, reducing support for a settings bug.",
                 "Simulated operator photo shows label skew matching guide-side drift.",
                 "Simulated maintenance photo shows loose guide clamp and guide ring offset.",
                 "Simulated post-adjustment vision sample shows 10/10 bottles within tolerance.",
@@ -364,6 +365,15 @@ def render_simulated_full_vision_evidence() -> str:
         "- Clamp meter: label feed motor current stayed within baseline range.",
         "- IR thermometer: label feed motor temperature remained within normal range.",
         "- Handheld signal tester: label-applied sensor transition clean after guide adjustment.",
+        "",
+        "Configuration Change Evidence",
+        "-----------------------------",
+        "- Last machine rehoming event: 2026-06-14T05:10:00Z.",
+        "- Timing recipe checksum after rehoming: unchanged.",
+        "- Label delay setting since last rehoming: unchanged at 100 ms.",
+        "- Tamp extend dwell setting since last rehoming: unchanged.",
+        "- Label-applied confirmation timeout since last rehoming: unchanged.",
+        "- Interpretation: no timing setting changed after rehoming, so a settings bug is unlikely for this event.",
     ]
     return "\n".join(rendered_rows)
 
@@ -426,6 +436,7 @@ def render_reasoning_engine_sections(
         f"- Observed lag {timing.observed_lag_ms} ms",
         f"- Delta +{timing.delta_ms} ms falls in the {drift_classification} band",
         "- Simulated guide correction brings 10-bottle validation sample back within alignment tolerance",
+        "- Configuration audit shows no timing setting changed since last rehoming",
         "",
         "Transitive Reasoning",
         "====================",
@@ -490,7 +501,8 @@ def render_reasoning_engine_sections(
             (
                 "Highest evidence alignment based on timing drift, preserved event "
                 "sequence, simulated guide-clamp photo evidence, guide offset "
-                "measurement, and post-adjustment validation."
+                "measurement, no timing-setting change since last rehoming, and "
+                "post-adjustment validation."
             ),
             "",
             "Reasoning Summary",
@@ -507,7 +519,7 @@ def render_reasoning_engine_sections(
             ),
             (
                 "- What evidence would falsify it: guide inspection passes while drift "
-                "persists after controlled bottle and tamp-pad checks."
+                "persists after controlled bottle, tamp-pad, and configuration checks."
             ),
             "- Next best troubleshooting step: Inspect Label Guide",
         ]

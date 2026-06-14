@@ -2,7 +2,7 @@ ContextOS Governed Response
 ===========================
 
 ContextOS Envelope:
-request_id       : 6142e449-fcfe-4eab-b798-e7cb47a20019
+request_id       : 6fa875fc-967c-4201-9459-c8cc51cfbbcb
 source_app       : ContextOS
 target_app       : LineAlertDemo
 user_intent      : Label Alignment Off
@@ -154,6 +154,15 @@ Handheld Diagnostic Tool Evidence
 - IR thermometer: label feed motor temperature remained within normal range.
 - Handheld signal tester: label-applied sensor transition clean after guide adjustment.
 
+Configuration Change Evidence
+-----------------------------
+- Last machine rehoming event: 2026-06-14T05:10:00Z.
+- Timing recipe checksum after rehoming: unchanged.
+- Label delay setting since last rehoming: unchanged at 100 ms.
+- Tamp extend dwell setting since last rehoming: unchanged.
+- Label-applied confirmation timeout since last rehoming: unchanged.
+- Interpretation: no timing setting changed after rehoming, so a settings bug is unlikely for this event.
+
 Expected State
 Tamp Extend -> Label Applied within 100 ms
 
@@ -212,6 +221,7 @@ Evidence used:
 - Observed lag 153 ms
 - Delta +53 ms falls in the Moderate Drift band
 - Simulated guide correction brings 10-bottle validation sample back within alignment tolerance
+- Configuration audit shows no timing setting changed since last rehoming
 
 Transitive Reasoning
 ====================
@@ -232,6 +242,7 @@ Abductive Hypothesis Ranking
    - Observed +53 ms moderate drift at the transfer-stage relationship.
    - Event order remains valid, which points away from a sequence-control fault.
    - Peter guide ranks label guide inspection as the first workflow step.
+   - Configuration audit shows no timing-setting change since last rehoming, reducing support for a settings bug.
    - Simulated operator photo shows label skew matching guide-side drift.
    - Simulated maintenance photo shows loose guide clamp and guide ring offset.
    - Simulated post-adjustment vision sample shows 10/10 bottles within tolerance.
@@ -296,7 +307,7 @@ Most Likely Explanation:
 Label guide loosened
 
 Why:
-Highest evidence alignment based on timing drift, preserved event sequence, simulated guide-clamp photo evidence, guide offset measurement, and post-adjustment validation.
+Highest evidence alignment based on timing drift, preserved event sequence, simulated guide-clamp photo evidence, guide offset measurement, no timing-setting change since last rehoming, and post-adjustment validation.
 
 Reasoning Summary
 =================
@@ -304,7 +315,7 @@ Reasoning Summary
 - Confidence score: 0.94
 - Why this is not absolute certainty: simulated evidence is deterministic demo data and still needs longer production-run validation.
 - What evidence would confirm it: loose guide found during inspection and alignment restored after securing the guide.
-- What evidence would falsify it: guide inspection passes while drift persists after controlled bottle and tamp-pad checks.
+- What evidence would falsify it: guide inspection passes while drift persists after controlled bottle, tamp-pad, and configuration checks.
 - Next best troubleshooting step: Inspect Label Guide
 
 Candidate Hypotheses
