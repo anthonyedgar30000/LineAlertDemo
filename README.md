@@ -868,6 +868,88 @@ No maintenance recommendations generated.
 No predictions generated.
 ```
 
+## Structured Troubleshooting Workflows
+
+Structured Troubleshooting Workflows represent guide content as deterministic
+decision trees:
+
+```text
+Symptom
+↓
+Check
+↓
+Action
+↓
+Validation
+↓
+Escalation
+```
+
+This layer executes the workflow structure shown in troubleshooting guides. It
+does not create recommendations, diagnoses, root-cause statements, AI reasoning,
+or inferred corrective actions.
+
+### Workflow File Tree
+
+```text
+config/
+└── labeling_decision_trees.json
+
+linealert/workflows/
+├── __init__.py
+├── decision_tree.py
+├── engine.py
+├── loader.py
+└── report.py
+
+linealert/tests/
+└── test_workflows.py
+```
+
+### Example Workflow JSON
+
+```json
+{
+  "workflow_id": "label_alignment_off",
+  "symptom": "Label Alignment is Off",
+  "steps": [
+    {
+      "check": "Peel tip square to bottle?",
+      "actions": ["Adjust Peel Angle"],
+      "validation": "Run product and verify label placement after this action."
+    }
+  ],
+  "related_workflows_if_unresolved": ["bubbles_on_labels"],
+  "escalation_conditions": [
+    "Issue continues after all checks and actions."
+  ]
+}
+```
+
+### Example Workflow Report
+
+```text
+STRUCTURED TROUBLESHOOTING WORKFLOW
+
+Reported Symptom: "Bubbles"
+
+Matched Symptom: Bubbles on Labels
+
+Workflow Steps:
+1. Check:
+   Enough pressure time?
+   Action Steps:
+   - Increase Aligner Run-On
+   Validation:
+   Run product and verify label adhesion after this action.
+
+If Unresolved, Review Related Workflows:
+- label_alignment_off
+
+Escalation Conditions:
+- Issue continues after all checks and actions.
+```
+
 ## Observation Confidence
 
 Observation Confidence evaluates the strength and trustworthiness of
