@@ -1,0 +1,112 @@
+{
+  "cycles": [
+    {
+      "cycle_id": 1,
+      "start_timestamp": "2026-06-14T10:02:00+00:00",
+      "end_timestamp": "2026-06-14T10:02:05.300000+00:00",
+      "duration_ms": 5300.0,
+      "status": "OutOfBaseline",
+      "event_count": 7,
+      "evidence_count": 1
+    },
+    {
+      "cycle_id": 2,
+      "start_timestamp": "2026-06-14T10:02:05.301000+00:00",
+      "end_timestamp": "2026-06-14T10:02:10.601000+00:00",
+      "duration_ms": 5300.0,
+      "status": "OutOfBaseline",
+      "event_count": 7,
+      "evidence_count": 1
+    },
+    {
+      "cycle_id": 3,
+      "start_timestamp": "2026-06-14T10:02:10.602000+00:00",
+      "end_timestamp": "2026-06-14T10:02:15.902000+00:00",
+      "duration_ms": 5300.0,
+      "status": "OutOfBaseline",
+      "event_count": 7,
+      "evidence_count": 1
+    },
+    {
+      "cycle_id": 4,
+      "start_timestamp": "2026-06-14T10:02:15.903000+00:00",
+      "end_timestamp": "2026-06-14T10:02:21.203000+00:00",
+      "duration_ms": 5300.0,
+      "status": "OutOfBaseline",
+      "event_count": 7,
+      "evidence_count": 1
+    },
+    {
+      "cycle_id": 5,
+      "start_timestamp": "2026-06-14T10:02:21.204000+00:00",
+      "end_timestamp": "2026-06-14T10:02:26.504000+00:00",
+      "duration_ms": 5300.0,
+      "status": "OutOfBaseline",
+      "event_count": 7,
+      "evidence_count": 1
+    },
+    {
+      "cycle_id": 6,
+      "start_timestamp": "2026-06-14T10:02:26.505000+00:00",
+      "end_timestamp": "2026-06-14T10:02:31.805000+00:00",
+      "duration_ms": 5300.0,
+      "status": "OutOfBaseline",
+      "event_count": 7,
+      "evidence_count": 1
+    },
+    {
+      "cycle_id": 7,
+      "start_timestamp": "2026-06-14T10:02:31.806000+00:00",
+      "end_timestamp": "2026-06-14T10:02:37.106000+00:00",
+      "duration_ms": 5300.0,
+      "status": "OutOfBaseline",
+      "event_count": 7,
+      "evidence_count": 1
+    },
+    {
+      "cycle_id": 8,
+      "start_timestamp": "2026-06-14T10:02:37.107000+00:00",
+      "end_timestamp": "2026-06-14T10:02:42.407000+00:00",
+      "duration_ms": 5300.0,
+      "status": "OutOfBaseline",
+      "event_count": 7,
+      "evidence_count": 1
+    },
+    {
+      "cycle_id": 9,
+      "start_timestamp": "2026-06-14T10:02:42.408000+00:00",
+      "end_timestamp": "2026-06-14T10:02:47.708000+00:00",
+      "duration_ms": 5300.0,
+      "status": "OutOfBaseline",
+      "event_count": 7,
+      "evidence_count": 1
+    },
+    {
+      "cycle_id": 10,
+      "start_timestamp": "2026-06-14T10:02:47.709000+00:00",
+      "end_timestamp": "2026-06-14T10:02:53.009000+00:00",
+      "duration_ms": 5300.0,
+      "status": "OutOfBaseline",
+      "event_count": 7,
+      "evidence_count": 1
+    },
+    {
+      "cycle_id": 11,
+      "start_timestamp": "2026-06-14T10:02:53.010000+00:00",
+      "end_timestamp": "2026-06-14T10:02:58.310000+00:00",
+      "duration_ms": 5300.0,
+      "status": "OutOfBaseline",
+      "event_count": 7,
+      "evidence_count": 1
+    },
+    {
+      "cycle_id": 12,
+      "start_timestamp": "2026-06-14T10:02:58.311000+00:00",
+      "end_timestamp": "2026-06-14T10:03:03.611000+00:00",
+      "duration_ms": 5300.0,
+      "status": "OutOfBaseline",
+      "event_count": 7,
+      "evidence_count": 1
+    }
+  ]
+}

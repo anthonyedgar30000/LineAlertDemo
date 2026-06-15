@@ -1,0 +1,816 @@
+{
+  "scenario": "SlowTamp_Prioritized",
+  "machine_state": "Production",
+  "event_timeline": "Cycle 1\n\n00.000 CycleStart\n01.100 ProductDetected\n02.200 PrintComplete\n03.000 TampExtendCommand\n04.100 TampExtendedSensor\n04.800 TampHomeSensor\n05.300 CycleComplete",
+  "cycle_summary": {
+    "cycles_observed": 12,
+    "cycles_affected": 12,
+    "affected_cycle_ids": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12
+    ],
+    "average_duration_ms": 5300.0,
+    "statuses": [
+      "OutOfBaseline",
+      "OutOfBaseline",
+      "OutOfBaseline",
+      "OutOfBaseline",
+      "OutOfBaseline",
+      "OutOfBaseline",
+      "OutOfBaseline",
+      "OutOfBaseline",
+      "OutOfBaseline",
+      "OutOfBaseline",
+      "OutOfBaseline",
+      "OutOfBaseline"
+    ]
+  },
+  "baseline_comparison": {
+    "relationship": "Tamp Extension Lag",
+    "baseline_ms": 600.0,
+    "observed_ms": 1100.0,
+    "deviation_percent": 83.333
+  },
+  "topology_validation": {
+    "component_count": 4,
+    "dependency_count": 3,
+    "missing_components": [],
+    "orphan_components": [],
+    "circular_dependencies": [],
+    "disconnected_chains": [],
+    "events_mapped_to_unknown_components": {},
+    "observations": []
+  },
+  "relationship_integrity": {
+    "expected_relationship_count": 3,
+    "observed_cycle_count": 12,
+    "valid_observation_count": 36,
+    "missing_required_relationships": [],
+    "order_violations": [],
+    "observation_count": 0,
+    "integrity_status": "Valid",
+    "observations": []
+  },
+  "dependency_chains": {
+    "dependency_graph": {
+      "chains": [
+        {
+          "chain_id": "chain_1",
+          "events": [
+            "ProductDetected",
+            "PrintComplete",
+            "TampExtendCommand",
+            "TampExtendedSensor",
+            "TampHomeSensor",
+            "CycleComplete"
+          ],
+          "direct_edges": [
+            {
+              "source": "ProductDetected",
+              "target": "PrintComplete"
+            },
+            {
+              "source": "PrintComplete",
+              "target": "TampExtendCommand"
+            },
+            {
+              "source": "TampExtendCommand",
+              "target": "TampExtendedSensor"
+            },
+            {
+              "source": "TampExtendedSensor",
+              "target": "TampHomeSensor"
+            },
+            {
+              "source": "TampHomeSensor",
+              "target": "CycleComplete"
+            }
+          ]
+        }
+      ],
+      "nodes": [
+        "CycleComplete",
+        "PrintComplete",
+        "ProductDetected",
+        "TampExtendCommand",
+        "TampExtendedSensor",
+        "TampHomeSensor"
+      ],
+      "direct_edges": [
+        {
+          "source": "PrintComplete",
+          "target": "TampExtendCommand"
+        },
+        {
+          "source": "ProductDetected",
+          "target": "PrintComplete"
+        },
+        {
+          "source": "TampExtendCommand",
+          "target": "TampExtendedSensor"
+        },
+        {
+          "source": "TampExtendedSensor",
+          "target": "TampHomeSensor"
+        },
+        {
+          "source": "TampHomeSensor",
+          "target": "CycleComplete"
+        }
+      ]
+    },
+    "validation": {
+      "chain_count": 1,
+      "observed_cycle_count": 12,
+      "path_health": [
+        {
+          "chain_id": "chain_1",
+          "events": [
+            "ProductDetected",
+            "PrintComplete",
+            "TampExtendCommand",
+            "TampExtendedSensor",
+            "TampHomeSensor",
+            "CycleComplete"
+          ],
+          "cycles_observed": 12,
+          "healthy_cycles": 12,
+          "disrupted_cycles": 0,
+          "percent_healthy": 100.0,
+          "status": "Healthy"
+        }
+      ],
+      "observation_count": 0,
+      "integrity_status": "Healthy",
+      "observations": []
+    }
+  },
+  "evidence_summary": {
+    "evidence_count": 15,
+    "evidence_density": 15,
+    "source_distribution": {
+      "Baseline Analysis": 12,
+      "Dependency Chain": 1,
+      "Relationship Integrity": 1,
+      "Topology Integrity": 1
+    },
+    "sources_contributing": 4,
+    "observation_clusters": [
+      {
+        "cluster": "Dependency Chain",
+        "evidence_count": 1,
+        "sources_contributing": 1,
+        "source_distribution": {
+          "Dependency Chain": 1
+        },
+        "cycles_observed": [
+          1
+        ],
+        "severity": "Normal",
+        "confidence": 0.9,
+        "supporting_evidence": [
+          {
+            "source": "Dependency Chain",
+            "observation": "Dependency chain healthy",
+            "severity": "Normal",
+            "confidence": 0.9,
+            "timestamp": "2026-06-14T10:00:00+00:00",
+            "cycle_id": 1,
+            "source_evidence": {
+              "chain_count": 1,
+              "observed_cycle_count": 12,
+              "path_health": [
+                {
+                  "chain_id": "chain_1",
+                  "events": [
+                    "ProductDetected",
+                    "PrintComplete",
+                    "TampExtendCommand",
+                    "TampExtendedSensor",
+                    "TampHomeSensor",
+                    "CycleComplete"
+                  ],
+                  "cycles_observed": 12,
+                  "healthy_cycles": 12,
+                  "disrupted_cycles": 0,
+                  "percent_healthy": 100.0,
+                  "status": "Healthy"
+                }
+              ],
+              "observation_count": 0,
+              "integrity_status": "Healthy",
+              "observations": []
+            },
+            "cluster": "Dependency Chain"
+          }
+        ]
+      },
+      {
+        "cluster": "Relationship Integrity",
+        "evidence_count": 1,
+        "sources_contributing": 1,
+        "source_distribution": {
+          "Relationship Integrity": 1
+        },
+        "cycles_observed": [
+          1
+        ],
+        "severity": "Normal",
+        "confidence": 0.9,
+        "supporting_evidence": [
+          {
+            "source": "Relationship Integrity",
+            "observation": "Relationship integrity valid",
+            "severity": "Normal",
+            "confidence": 0.9,
+            "timestamp": "2026-06-14T10:00:00+00:00",
+            "cycle_id": 1,
+            "source_evidence": {
+              "expected_relationship_count": 3,
+              "observed_cycle_count": 12,
+              "valid_observation_count": 36,
+              "missing_required_relationships": [],
+              "order_violations": [],
+              "observation_count": 0,
+              "integrity_status": "Valid",
+              "observations": []
+            },
+            "cluster": "Relationship Integrity"
+          }
+        ]
+      },
+      {
+        "cluster": "Tamp Operation Deviation",
+        "evidence_count": 12,
+        "sources_contributing": 1,
+        "source_distribution": {
+          "Baseline Analysis": 12
+        },
+        "cycles_observed": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ],
+        "severity": "Significant Deviation",
+        "confidence": 0.95,
+        "supporting_evidence": [
+          {
+            "source": "Baseline Analysis",
+            "observation": "Tamp Extension Lag exceeded baseline",
+            "severity": "Significant Deviation",
+            "confidence": 0.95,
+            "timestamp": "2026-06-14T10:00:00+00:00",
+            "cycle_id": 1,
+            "source_evidence": {
+              "relationship": "Tamp Extension Lag",
+              "measured_ms": 1100.0,
+              "baseline_ms": 600.0,
+              "deviation_percent": 83.333
+            },
+            "cluster": "Tamp Operation Deviation"
+          },
+          {
+            "source": "Baseline Analysis",
+            "observation": "Tamp Extension Lag exceeded baseline",
+            "severity": "Significant Deviation",
+            "confidence": 0.95,
+            "timestamp": "2026-06-14T10:00:05.301000+00:00",
+            "cycle_id": 2,
+            "source_evidence": {
+              "relationship": "Tamp Extension Lag",
+              "measured_ms": 1100.0,
+              "baseline_ms": 600.0,
+              "deviation_percent": 83.333
+            },
+            "cluster": "Tamp Operation Deviation"
+          },
+          {
+            "source": "Baseline Analysis",
+            "observation": "Tamp Extension Lag exceeded baseline",
+            "severity": "Significant Deviation",
+            "confidence": 0.95,
+            "timestamp": "2026-06-14T10:00:10.602000+00:00",
+            "cycle_id": 3,
+            "source_evidence": {
+              "relationship": "Tamp Extension Lag",
+              "measured_ms": 1100.0,
+              "baseline_ms": 600.0,
+              "deviation_percent": 83.333
+            },
+            "cluster": "Tamp Operation Deviation"
+          },
+          {
+            "source": "Baseline Analysis",
+            "observation": "Tamp Extension Lag exceeded baseline",
+            "severity": "Significant Deviation",
+            "confidence": 0.95,
+            "timestamp": "2026-06-14T10:00:15.903000+00:00",
+            "cycle_id": 4,
+            "source_evidence": {
+              "relationship": "Tamp Extension Lag",
+              "measured_ms": 1100.0,
+              "baseline_ms": 600.0,
+              "deviation_percent": 83.333
+            },
+            "cluster": "Tamp Operation Deviation"
+          },
+          {
+            "source": "Baseline Analysis",
+            "observation": "Tamp Extension Lag exceeded baseline",
+            "severity": "Significant Deviation",
+            "confidence": 0.95,
+            "timestamp": "2026-06-14T10:00:21.204000+00:00",
+            "cycle_id": 5,
+            "source_evidence": {
+              "relationship": "Tamp Extension Lag",
+              "measured_ms": 1100.0,
+              "baseline_ms": 600.0,
+              "deviation_percent": 83.333
+            },
+            "cluster": "Tamp Operation Deviation"
+          },
+          {
+            "source": "Baseline Analysis",
+            "observation": "Tamp Extension Lag exceeded baseline",
+            "severity": "Significant Deviation",
+            "confidence": 0.95,
+            "timestamp": "2026-06-14T10:00:26.505000+00:00",
+            "cycle_id": 6,
+            "source_evidence": {
+              "relationship": "Tamp Extension Lag",
+              "measured_ms": 1100.0,
+              "baseline_ms": 600.0,
+              "deviation_percent": 83.333
+            },
+            "cluster": "Tamp Operation Deviation"
+          },
+          {
+            "source": "Baseline Analysis",
+            "observation": "Tamp Extension Lag exceeded baseline",
+            "severity": "Significant Deviation",
+            "confidence": 0.95,
+            "timestamp": "2026-06-14T10:00:31.806000+00:00",
+            "cycle_id": 7,
+            "source_evidence": {
+              "relationship": "Tamp Extension Lag",
+              "measured_ms": 1100.0,
+              "baseline_ms": 600.0,
+              "deviation_percent": 83.333
+            },
+            "cluster": "Tamp Operation Deviation"
+          },
+          {
+            "source": "Baseline Analysis",
+            "observation": "Tamp Extension Lag exceeded baseline",
+            "severity": "Significant Deviation",
+            "confidence": 0.95,
+            "timestamp": "2026-06-14T10:00:37.107000+00:00",
+            "cycle_id": 8,
+            "source_evidence": {
+              "relationship": "Tamp Extension Lag",
+              "measured_ms": 1100.0,
+              "baseline_ms": 600.0,
+              "deviation_percent": 83.333
+            },
+            "cluster": "Tamp Operation Deviation"
+          },
+          {
+            "source": "Baseline Analysis",
+            "observation": "Tamp Extension Lag exceeded baseline",
+            "severity": "Significant Deviation",
+            "confidence": 0.95,
+            "timestamp": "2026-06-14T10:00:42.408000+00:00",
+            "cycle_id": 9,
+            "source_evidence": {
+              "relationship": "Tamp Extension Lag",
+              "measured_ms": 1100.0,
+              "baseline_ms": 600.0,
+              "deviation_percent": 83.333
+            },
+            "cluster": "Tamp Operation Deviation"
+          },
+          {
+            "source": "Baseline Analysis",
+            "observation": "Tamp Extension Lag exceeded baseline",
+            "severity": "Significant Deviation",
+            "confidence": 0.95,
+            "timestamp": "2026-06-14T10:00:47.709000+00:00",
+            "cycle_id": 10,
+            "source_evidence": {
+              "relationship": "Tamp Extension Lag",
+              "measured_ms": 1100.0,
+              "baseline_ms": 600.0,
+              "deviation_percent": 83.333
+            },
+            "cluster": "Tamp Operation Deviation"
+          },
+          {
+            "source": "Baseline Analysis",
+            "observation": "Tamp Extension Lag exceeded baseline",
+            "severity": "Significant Deviation",
+            "confidence": 0.95,
+            "timestamp": "2026-06-14T10:00:53.010000+00:00",
+            "cycle_id": 11,
+            "source_evidence": {
+              "relationship": "Tamp Extension Lag",
+              "measured_ms": 1100.0,
+              "baseline_ms": 600.0,
+              "deviation_percent": 83.333
+            },
+            "cluster": "Tamp Operation Deviation"
+          },
+          {
+            "source": "Baseline Analysis",
+            "observation": "Tamp Extension Lag exceeded baseline",
+            "severity": "Significant Deviation",
+            "confidence": 0.95,
+            "timestamp": "2026-06-14T10:00:58.311000+00:00",
+            "cycle_id": 12,
+            "source_evidence": {
+              "relationship": "Tamp Extension Lag",
+              "measured_ms": 1100.0,
+              "baseline_ms": 600.0,
+              "deviation_percent": 83.333
+            },
+            "cluster": "Tamp Operation Deviation"
+          }
+        ]
+      },
+      {
+        "cluster": "Topology Integrity",
+        "evidence_count": 1,
+        "sources_contributing": 1,
+        "source_distribution": {
+          "Topology Integrity": 1
+        },
+        "cycles_observed": [
+          1
+        ],
+        "severity": "Normal",
+        "confidence": 1.0,
+        "supporting_evidence": [
+          {
+            "source": "Topology Integrity",
+            "observation": "Topology validation valid",
+            "severity": "Normal",
+            "confidence": 1.0,
+            "timestamp": "2026-06-14T10:00:00+00:00",
+            "cycle_id": 1,
+            "source_evidence": {
+              "component_count": 4,
+              "dependency_count": 3,
+              "missing_components": [],
+              "orphan_components": [],
+              "circular_dependencies": [],
+              "disconnected_chains": [],
+              "events_mapped_to_unknown_components": {},
+              "observations": []
+            },
+            "cluster": "Topology Integrity"
+          }
+        ]
+      }
+    ]
+  },
+  "historical_context": {
+    "cycles_observed": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12
+    ],
+    "observation_summaries": [
+      {
+        "observation": "Tamp Extension Lag exceeded baseline",
+        "cycles": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ],
+        "occurrences": 12,
+        "persistence_cycles": 12,
+        "recurrence_count": 12,
+        "severity_history": [
+          "Significant Deviation",
+          "Significant Deviation",
+          "Significant Deviation",
+          "Significant Deviation",
+          "Significant Deviation",
+          "Significant Deviation",
+          "Significant Deviation",
+          "Significant Deviation",
+          "Significant Deviation",
+          "Significant Deviation",
+          "Significant Deviation",
+          "Significant Deviation"
+        ],
+        "source_systems": [
+          "Baseline Analysis"
+        ]
+      }
+    ],
+    "evidence_density_trend": {
+      "density_by_cycle": {
+        "1": 1,
+        "2": 1,
+        "3": 1,
+        "4": 1,
+        "5": 1,
+        "6": 1,
+        "7": 1,
+        "8": 1,
+        "9": 1,
+        "10": 1,
+        "11": 1,
+        "12": 1
+      },
+      "direction": "Flat",
+      "average_step_change": 0
+    },
+    "cluster_history": [
+      {
+        "cluster": "Tamp Operation Deviation",
+        "cycles_observed": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ],
+        "occurrence_count": 12,
+        "persistence_cycles": 12,
+        "recurrence_count": 12
+      }
+    ],
+    "historical_drift_indicators": [
+      {
+        "metric_name": "Average Tamp Lag",
+        "start_cycle": 0,
+        "end_cycle": 12,
+        "start_value": 600.0,
+        "end_value": 1100.0,
+        "change": 500.0,
+        "unit": "ms",
+        "direction": "Increasing",
+        "status": "Historical Increase Detected"
+      }
+    ]
+  },
+  "confidence_summary": {
+    "observation": "Tamp Extension Lag exceeded baseline",
+    "confidence": 1.0,
+    "classification": "Very High",
+    "factors": [
+      {
+        "name": "Supporting Evidence",
+        "description": "15 supporting evidence item(s) across 4 observation cluster(s)",
+        "contribution": 0.25
+      },
+      {
+        "name": "Historical Persistence",
+        "description": "Observed across 12 occurrence(s); 12 consecutive cycle(s); 12 recurrence observation(s)",
+        "contribution": 0.2
+      },
+      {
+        "name": "Multi-Source Confirmation",
+        "description": "4 supporting evidence source(s)",
+        "contribution": 0.2
+      },
+      {
+        "name": "Topology Validation",
+        "description": "Topology=Valid; RelationshipIntegrity=Valid; DependencyChains=Healthy",
+        "contribution": 0.15
+      },
+      {
+        "name": "Configuration Validity",
+        "description": "BaselineValid=True; ConfigurationProvenance=Valid; ConfigurationDriftPresent=False",
+        "contribution": 0.15
+      }
+    ]
+  },
+  "matched_workflow": {
+    "matched": true,
+    "workflow_id": "bubbles_on_labels",
+    "symptom": "Bubbles on Labels",
+    "display_name": "Bubbles on Labels / Tamp Delay Workflow",
+    "guide_steps": [
+      "Enough pressure time?",
+      "Increase Aligner Run-On",
+      "Increase Bottle Pressure",
+      "Decrease Label Speed"
+    ],
+    "structured_steps": [
+      {
+        "check": "Enough pressure time?",
+        "actions": [
+          "Increase Aligner Run-On"
+        ],
+        "validation": "Run product and verify label adhesion after this action."
+      },
+      {
+        "check": "Is bottle stable?",
+        "actions": [
+          "Increase Bottle Pressure"
+        ],
+        "validation": "Run product and verify label adhesion after this action."
+      },
+      {
+        "check": "Is contact pressure consistent?",
+        "actions": [
+          "Inspect Contact / Wipe Pressure"
+        ],
+        "validation": "Run product and verify label adhesion after this action."
+      },
+      {
+        "check": "Does slowing machine help?",
+        "actions": [
+          "Decrease Label Speed"
+        ],
+        "validation": "Run product and verify label adhesion after this action."
+      }
+    ],
+    "validation": "Run additional cycles and verify lag returns within baseline.",
+    "escalation_conditions": [
+      "Issue continues after all checks and actions.",
+      "Multiple issues are occurring at the same time.",
+      "Mechanical damage or worn parts are observed.",
+      "Unusual noises or air leaks are present."
+    ]
+  },
+  "workflow_prioritization": {
+    "workflow_id": "bubbles_on_labels",
+    "symptom": "Bubbles on Labels",
+    "observed_condition": "Tamp Extension Lag exceeded baseline",
+    "supported_by_evidence": [
+      "Baseline Analysis: Tamp Extension Lag exceeded baseline",
+      "Relationship Integrity: required relationships observed in order",
+      "Dependency Chain: configured dependency path observed",
+      "Topology Integrity: topology validation passed",
+      "Confidence Engine: Very High confidence"
+    ],
+    "not_supported_by_evidence": [
+      "No gap detection observations present",
+      "No spacing anomalies observed",
+      "No multiple-label observations present"
+    ],
+    "check_first": [
+      {
+        "label": "Enough pressure time?",
+        "decision": "CHECK FIRST",
+        "reason": "Observed condition directly relates to tamp delay",
+        "original_index": 1,
+        "check": "Enough pressure time?",
+        "actions": [
+          "Increase Aligner Run-On"
+        ],
+        "validation": "Run product and verify label adhesion after this action."
+      },
+      {
+        "label": "Is bottle stable?",
+        "decision": "CHECK FIRST",
+        "reason": "Observed condition directly relates to tamp delay",
+        "original_index": 2,
+        "check": "Is bottle stable?",
+        "actions": [
+          "Increase Bottle Pressure"
+        ],
+        "validation": "Run product and verify label adhesion after this action."
+      }
+    ],
+    "check_second": [
+      {
+        "label": "Is contact pressure consistent?",
+        "decision": "CHECK SECOND",
+        "reason": "Guide step may affect observed timing but is not the primary evidence match",
+        "original_index": 3,
+        "check": "Is contact pressure consistent?",
+        "actions": [
+          "Inspect Contact / Wipe Pressure"
+        ],
+        "validation": "Run product and verify label adhesion after this action."
+      },
+      {
+        "label": "Does slowing machine help?",
+        "decision": "CHECK SECOND",
+        "reason": "Guide step may affect observed timing but is not the primary evidence match",
+        "original_index": 4,
+        "check": "Does slowing machine help?",
+        "actions": [
+          "Decrease Label Speed"
+        ],
+        "validation": "Run product and verify label adhesion after this action."
+      }
+    ],
+    "deferred": [
+      {
+        "label": "Label Has Stretch Lines workflow",
+        "decision": "DEFERRED",
+        "reason": "No direct supporting evidence observed for this workflow branch"
+      }
+    ],
+    "ruled_out": [
+      {
+        "label": "Multiple Labels Applying workflow",
+        "decision": "RULED OUT",
+        "reason": "No multiple-label observations present"
+      }
+    ]
+  },
+  "workflow_prioritization_text": "WORKFLOW ASSESSMENT\n\nObserved Condition:\nTamp Extension Lag exceeded baseline\n\nSupported By Evidence\n- Baseline Analysis: Tamp Extension Lag exceeded baseline\n- Relationship Integrity: required relationships observed in order\n- Dependency Chain: configured dependency path observed\n- Topology Integrity: topology validation passed\n- Confidence Engine: Very High confidence\n\nNot Supported By Evidence\n- No gap detection observations present\n- No spacing anomalies observed\n- No multiple-label observations present\n\nWorkflow Prioritization\n\nCHECK FIRST\n1. Enough pressure time?\n   Reason: Observed condition directly relates to tamp delay\n   Action Step: Increase Aligner Run-On\n2. Is bottle stable?\n   Reason: Observed condition directly relates to tamp delay\n   Action Step: Increase Bottle Pressure\n\nCHECK SECOND\n3. Is contact pressure consistent?\n   Reason: Guide step may affect observed timing but is not the primary evidence match\n   Action Step: Inspect Contact / Wipe Pressure\n4. Does slowing machine help?\n   Reason: Guide step may affect observed timing but is not the primary evidence match\n   Action Step: Decrease Label Speed\n\nDEFERRED\n- Label Has Stretch Lines workflow\n  Reason: No direct supporting evidence observed for this workflow branch\n\nRULED OUT\n- Multiple Labels Applying workflow\n  Reason: No multiple-label observations present\n\nDeterministic workflow routing only.\nExisting evidence boundaries preserved.\n",
+  "situation_assessment": {
+    "assessment_id": "demo-linealert-situation-assessment",
+    "machine_state": "Production",
+    "cycles_observed": 12,
+    "situation_status": "Significant Deviation",
+    "affected_components": [
+      "Tamp Cylinder"
+    ],
+    "observed_conditions": [
+      "Tamp Extension Lag exceeded baseline",
+      "Average measured lag 1100 ms",
+      "Baseline lag 600 ms",
+      "Average deviation 83.333%",
+      "12 of 12 cycles exceeded baseline",
+      "Topology validation passed"
+    ],
+    "out_of_baseline_relationships": [
+      {
+        "relationship": "Tamp Extension Lag",
+        "cycles_affected": 12,
+        "average_measured_ms": 1100.0,
+        "baseline_ms": 600.0,
+        "average_deviation_percent": 83.333
+      }
+    ],
+    "topology_integrity": "Valid",
+    "confidence": 0.95,
+    "situation_summary": {
+      "cycles_observed": 12,
+      "cycles_out_of_baseline": 12,
+      "percent_affected": 100,
+      "affected_components": [
+        "Tamp Cylinder"
+      ]
+    },
+    "evidence_summary": {
+      "evidence_count": 15,
+      "evidence_density": 15,
+      "evidence_sources_contributing": 4,
+      "evidence_source_distribution": {
+        "Baseline Analysis": 12,
+        "Dependency Chain": 1,
+        "Relationship Integrity": 1,
+        "Topology Integrity": 1
+      },
+      "observation_clusters": [
+        "Dependency Chain",
+        "Relationship Integrity",
+        "Tamp Operation Deviation",
+        "Topology Integrity"
+      ]
+    }
+  }
+}

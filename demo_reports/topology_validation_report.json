@@ -1,0 +1,10 @@
+{
+  "component_count": 4,
+  "dependency_count": 3,
+  "missing_components": [],
+  "orphan_components": [],
+  "circular_dependencies": [],
+  "disconnected_chains": [],
+  "events_mapped_to_unknown_components": {},
+  "observations": []
+}

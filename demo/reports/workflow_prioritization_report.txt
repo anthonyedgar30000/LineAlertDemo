@@ -1,0 +1,45 @@
+WORKFLOW ASSESSMENT
+
+Observed Condition:
+Tamp Extension Lag exceeded baseline
+
+Supported By Evidence
+- Baseline Analysis: Tamp Extension Lag exceeded baseline
+- Relationship Integrity: required relationships observed in order
+- Dependency Chain: configured dependency path observed
+- Topology Integrity: topology validation passed
+- Confidence Engine: Very High confidence
+
+Not Supported By Evidence
+- No gap detection observations present
+- No spacing anomalies observed
+- No multiple-label observations present
+
+Workflow Prioritization
+
+CHECK FIRST
+1. Enough pressure time?
+   Reason: Observed condition directly relates to tamp delay
+   Action Step: Increase Aligner Run-On
+2. Is bottle stable?
+   Reason: Observed condition directly relates to tamp delay
+   Action Step: Increase Bottle Pressure
+
+CHECK SECOND
+3. Is contact pressure consistent?
+   Reason: Guide step may affect observed timing but is not the primary evidence match
+   Action Step: Inspect Contact / Wipe Pressure
+4. Does slowing machine help?
+   Reason: Guide step may affect observed timing but is not the primary evidence match
+   Action Step: Decrease Label Speed
+
+DEFERRED
+- Label Has Stretch Lines workflow
+  Reason: No direct supporting evidence observed for this workflow branch
+
+RULED OUT
+- Multiple Labels Applying workflow
+  Reason: No multiple-label observations present
+
+Deterministic workflow routing only.
+Existing evidence boundaries preserved.

@@ -1,0 +1,19 @@
+{
+  "relationships": [
+    {
+      "source": "TampExtendCommand",
+      "target": "TampExtendedSensor",
+      "required": true
+    },
+    {
+      "source": "PrintComplete",
+      "target": "TampExtendCommand",
+      "required": true
+    },
+    {
+      "source": "ProductDetected",
+      "target": "PrintComplete",
+      "required": true
+    }
+  ]
+}

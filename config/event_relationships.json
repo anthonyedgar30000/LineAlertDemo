@@ -1,0 +1,22 @@
+{
+  "relationships": [
+    {
+      "name": "Tamp Extension Lag",
+      "from": "TampExtendCommand",
+      "to": "TampExtendedSensor",
+      "type": "lag"
+    },
+    {
+      "name": "Product Print Response",
+      "from": "ProductDetected",
+      "to": "PrintComplete",
+      "type": "lag"
+    },
+    {
+      "name": "Print To Tamp Command",
+      "from": "PrintComplete",
+      "to": "TampExtendCommand",
+      "type": "lag"
+    }
+  ]
+}

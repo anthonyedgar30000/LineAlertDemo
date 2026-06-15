@@ -1,0 +1,36 @@
+{
+  "assessment_id": "demo-slowtamp-production-assessment",
+  "machine_state": "Production",
+  "cycles_observed": 12,
+  "situation_status": "Significant Deviation",
+  "affected_components": [
+    "Tamp Cylinder"
+  ],
+  "observed_conditions": [
+    "Tamp Extension Lag exceeded baseline",
+    "Average measured lag 1100 ms",
+    "Baseline lag 600 ms",
+    "Average deviation 83.333%",
+    "12 of 12 cycles exceeded baseline",
+    "Topology validation passed"
+  ],
+  "out_of_baseline_relationships": [
+    {
+      "relationship": "Tamp Extension Lag",
+      "cycles_affected": 12,
+      "average_measured_ms": 1100.0,
+      "baseline_ms": 600.0,
+      "average_deviation_percent": 83.333
+    }
+  ],
+  "topology_integrity": "Valid",
+  "confidence": 0.95,
+  "situation_summary": {
+    "cycles_observed": 12,
+    "cycles_out_of_baseline": 12,
+    "percent_affected": 100,
+    "affected_components": [
+      "Tamp Cylinder"
+    ]
+  }
+}

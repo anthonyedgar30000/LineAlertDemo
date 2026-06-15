@@ -1,0 +1,138 @@
+{
+  "anomaly_count": 1,
+  "evidence_count": 12,
+  "anomalies": [
+    {
+      "issue_type": "ExcessiveLag",
+      "relationship": "Tamp Extension Lag",
+      "baseline_lag_ms": 600.0,
+      "observed_lag_ms": 1100.0,
+      "deviation_percent": 83.333,
+      "severity": "High",
+      "confidence": 0.99,
+      "evidence_count": 12
+    }
+  ],
+  "evidence": [
+    {
+      "issue_type": "ExcessiveLag",
+      "cycle_id": 1,
+      "timestamp": "2026-06-14T10:02:00+00:00",
+      "relationship": "Tamp Extension Lag",
+      "expected_ms": 600.0,
+      "observed_ms": 1100.0,
+      "deviation_percent": 83.333,
+      "details": "TampExtendCommand->TampExtendedSensor exceeded baseline lag."
+    },
+    {
+      "issue_type": "ExcessiveLag",
+      "cycle_id": 2,
+      "timestamp": "2026-06-14T10:02:05.301000+00:00",
+      "relationship": "Tamp Extension Lag",
+      "expected_ms": 600.0,
+      "observed_ms": 1100.0,
+      "deviation_percent": 83.333,
+      "details": "TampExtendCommand->TampExtendedSensor exceeded baseline lag."
+    },
+    {
+      "issue_type": "ExcessiveLag",
+      "cycle_id": 3,
+      "timestamp": "2026-06-14T10:02:10.602000+00:00",
+      "relationship": "Tamp Extension Lag",
+      "expected_ms": 600.0,
+      "observed_ms": 1100.0,
+      "deviation_percent": 83.333,
+      "details": "TampExtendCommand->TampExtendedSensor exceeded baseline lag."
+    },
+    {
+      "issue_type": "ExcessiveLag",
+      "cycle_id": 4,
+      "timestamp": "2026-06-14T10:02:15.903000+00:00",
+      "relationship": "Tamp Extension Lag",
+      "expected_ms": 600.0,
+      "observed_ms": 1100.0,
+      "deviation_percent": 83.333,
+      "details": "TampExtendCommand->TampExtendedSensor exceeded baseline lag."
+    },
+    {
+      "issue_type": "ExcessiveLag",
+      "cycle_id": 5,
+      "timestamp": "2026-06-14T10:02:21.204000+00:00",
+      "relationship": "Tamp Extension Lag",
+      "expected_ms": 600.0,
+      "observed_ms": 1100.0,
+      "deviation_percent": 83.333,
+      "details": "TampExtendCommand->TampExtendedSensor exceeded baseline lag."
+    },
+    {
+      "issue_type": "ExcessiveLag",
+      "cycle_id": 6,
+      "timestamp": "2026-06-14T10:02:26.505000+00:00",
+      "relationship": "Tamp Extension Lag",
+      "expected_ms": 600.0,
+      "observed_ms": 1100.0,
+      "deviation_percent": 83.333,
+      "details": "TampExtendCommand->TampExtendedSensor exceeded baseline lag."
+    },
+    {
+      "issue_type": "ExcessiveLag",
+      "cycle_id": 7,
+      "timestamp": "2026-06-14T10:02:31.806000+00:00",
+      "relationship": "Tamp Extension Lag",
+      "expected_ms": 600.0,
+      "observed_ms": 1100.0,
+      "deviation_percent": 83.333,
+      "details": "TampExtendCommand->TampExtendedSensor exceeded baseline lag."
+    },
+    {
+      "issue_type": "ExcessiveLag",
+      "cycle_id": 8,
+      "timestamp": "2026-06-14T10:02:37.107000+00:00",
+      "relationship": "Tamp Extension Lag",
+      "expected_ms": 600.0,
+      "observed_ms": 1100.0,
+      "deviation_percent": 83.333,
+      "details": "TampExtendCommand->TampExtendedSensor exceeded baseline lag."
+    },
+    {
+      "issue_type": "ExcessiveLag",
+      "cycle_id": 9,
+      "timestamp": "2026-06-14T10:02:42.408000+00:00",
+      "relationship": "Tamp Extension Lag",
+      "expected_ms": 600.0,
+      "observed_ms": 1100.0,
+      "deviation_percent": 83.333,
+      "details": "TampExtendCommand->TampExtendedSensor exceeded baseline lag."
+    },
+    {
+      "issue_type": "ExcessiveLag",
+      "cycle_id": 10,
+      "timestamp": "2026-06-14T10:02:47.709000+00:00",
+      "relationship": "Tamp Extension Lag",
+      "expected_ms": 600.0,
+      "observed_ms": 1100.0,
+      "deviation_percent": 83.333,
+      "details": "TampExtendCommand->TampExtendedSensor exceeded baseline lag."
+    },
+    {
+      "issue_type": "ExcessiveLag",
+      "cycle_id": 11,
+      "timestamp": "2026-06-14T10:02:53.010000+00:00",
+      "relationship": "Tamp Extension Lag",
+      "expected_ms": 600.0,
+      "observed_ms": 1100.0,
+      "deviation_percent": 83.333,
+      "details": "TampExtendCommand->TampExtendedSensor exceeded baseline lag."
+    },
+    {
+      "issue_type": "ExcessiveLag",
+      "cycle_id": 12,
+      "timestamp": "2026-06-14T10:02:58.311000+00:00",
+      "relationship": "Tamp Extension Lag",
+      "expected_ms": 600.0,
+      "observed_ms": 1100.0,
+      "deviation_percent": 83.333,
+      "details": "TampExtendCommand->TampExtendedSensor exceeded baseline lag."
+    }
+  ]
+}

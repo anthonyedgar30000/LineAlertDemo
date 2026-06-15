@@ -1,0 +1,240 @@
+{
+  "guide": {
+    "name": "Labeling Troubleshooting Guide",
+    "workflow_style": "symptom_check_action_validation_escalation",
+    "source": "Structured labeling troubleshooting guide"
+  },
+  "workflows": [
+    {
+      "workflow_id": "label_alignment_off",
+      "symptom": "Label Alignment is Off",
+      "aliases": [
+        "Label alignment off",
+        "Alignment off",
+        "Label is crooked",
+        "Crooked label"
+      ],
+      "examples": [
+        "Crooked label",
+        "Rotated label",
+        "Inconsistent placement",
+        "Drifting placement",
+        "Skewed left/right"
+      ],
+      "steps": [
+        {
+          "check": "Peel tip square to bottle?",
+          "actions": ["Adjust Peel Angle"],
+          "validation": "Run product and verify label placement after this action."
+        },
+        {
+          "check": "Is bottle stable during application?",
+          "actions": ["Adjust Hold Down"],
+          "validation": "Run product and verify label placement after this action."
+        },
+        {
+          "check": "Are guide rings centered?",
+          "actions": ["Check Guide Rings"],
+          "validation": "Run product and verify label placement after this action."
+        },
+        {
+          "check": "Is issue constant or intermittent?",
+          "actions": ["Increase Label Delay"],
+          "validation": "Run product and verify label placement after this action."
+        },
+        {
+          "check": "Does issue worsen at higher speed?",
+          "actions": ["Reduce Speed Temporarily"],
+          "validation": "Run product and verify label placement after this action."
+        }
+      ],
+      "related_workflows_if_unresolved": ["bubbles_on_labels"],
+      "escalation_conditions": [
+        "Issue continues after all checks and actions.",
+        "Multiple issues are occurring at the same time.",
+        "Mechanical damage or worn parts are observed.",
+        "Unusual noises or air leaks are present.",
+        "Replacement parts are required."
+      ]
+    },
+    {
+      "workflow_id": "label_has_folds",
+      "symptom": "Label Has Folds",
+      "aliases": [
+        "Label folds",
+        "Folds",
+        "Wrinkled label",
+        "Label wrinkles"
+      ],
+      "examples": [
+        "Wrinkles",
+        "Folded edges",
+        "Label bunching",
+        "Uneven application"
+      ],
+      "steps": [
+        {
+          "check": "Is label speed too high?",
+          "actions": ["Decrease Label Speed"],
+          "validation": "Run product and verify label surface after this action."
+        },
+        {
+          "check": "Is aligner speed too slow?",
+          "actions": ["Increase Aligner Speed"],
+          "validation": "Run product and verify label surface after this action."
+        },
+        {
+          "check": "Are folds random or consistent?",
+          "actions": ["Verify Product Stability"],
+          "validation": "Run product and verify label surface after this action."
+        },
+        {
+          "check": "Does reducing speed help?",
+          "actions": ["Reduce Conveyor Speed"],
+          "validation": "Run product and verify label surface after this action."
+        }
+      ],
+      "related_workflows_if_unresolved": ["label_has_stretch_lines"],
+      "escalation_conditions": [
+        "Issue continues after all checks and actions.",
+        "Multiple issues are occurring at the same time.",
+        "Mechanical damage or worn parts are observed.",
+        "Replacement parts are required."
+      ]
+    },
+    {
+      "workflow_id": "label_has_stretch_lines",
+      "symptom": "Label Has Stretch Lines",
+      "aliases": [
+        "Stretch lines",
+        "Stretched label",
+        "Tension marks"
+      ],
+      "examples": [
+        "Stretched label",
+        "Tension marks",
+        "Distorted print",
+        "Label pulling"
+      ],
+      "steps": [
+        {
+          "check": "Is label tension too high?",
+          "actions": ["Verify Label Tension"],
+          "validation": "Run product and verify label surface after this action."
+        },
+        {
+          "check": "Does issue worsen at higher speed?",
+          "actions": ["Decrease Label Speed"],
+          "validation": "Run product and verify label surface after this action."
+        },
+        {
+          "check": "Are feed rollers pulling unevenly?",
+          "actions": ["Inspect Feed Rollers"],
+          "validation": "Run product and verify label surface after this action."
+        },
+        {
+          "check": "Does aligner speed need adjustment?",
+          "actions": ["Increase Aligner Speed"],
+          "validation": "Run product and verify label surface after this action."
+        }
+      ],
+      "related_workflows_if_unresolved": [
+        "label_has_folds",
+        "multiple_labels_applying"
+      ],
+      "escalation_conditions": [
+        "Issue continues after all checks and actions.",
+        "Multiple issues are occurring at the same time.",
+        "Mechanical damage or worn parts are observed.",
+        "Replacement parts are required."
+      ]
+    },
+    {
+      "workflow_id": "bubbles_on_labels",
+      "symptom": "Bubbles on Labels",
+      "aliases": [
+        "Bubbles",
+        "Air bubbles",
+        "Label bubbles"
+      ],
+      "examples": [
+        "Trapped air bubbles",
+        "Incomplete adhesion",
+        "Lifting label edges"
+      ],
+      "steps": [
+        {
+          "check": "Enough pressure time?",
+          "actions": ["Increase Aligner Run-On"],
+          "validation": "Run product and verify label adhesion after this action."
+        },
+        {
+          "check": "Is bottle stable?",
+          "actions": ["Increase Bottle Pressure"],
+          "validation": "Run product and verify label adhesion after this action."
+        },
+        {
+          "check": "Is contact pressure consistent?",
+          "actions": ["Inspect Contact / Wipe Pressure"],
+          "validation": "Run product and verify label adhesion after this action."
+        },
+        {
+          "check": "Does slowing machine help?",
+          "actions": ["Decrease Label Speed"],
+          "validation": "Run product and verify label adhesion after this action."
+        }
+      ],
+      "related_workflows_if_unresolved": ["label_alignment_off"],
+      "escalation_conditions": [
+        "Issue continues after all checks and actions.",
+        "Multiple issues are occurring at the same time.",
+        "Mechanical damage or worn parts are observed.",
+        "Unusual noises or air leaks are present."
+      ]
+    },
+    {
+      "workflow_id": "multiple_labels_applying",
+      "symptom": "Multiple Labels Applying",
+      "aliases": [
+        "Multiple labels",
+        "Double labels",
+        "Overlapping labels",
+        "Skipped gaps"
+      ],
+      "examples": [
+        "Double labels",
+        "Skipped gaps",
+        "Overlapping labels"
+      ],
+      "steps": [
+        {
+          "check": "Is sensor detecting gaps properly?",
+          "actions": ["Adjust Sensor Sensitivity"],
+          "validation": "Run product and verify label count and spacing after this action."
+        },
+        {
+          "check": "Is spacing consistent?",
+          "actions": ["Check Label Spacing"],
+          "validation": "Run product and verify label count and spacing after this action."
+        },
+        {
+          "check": "Is issue intermittent?",
+          "actions": ["Reposition Sensor"],
+          "validation": "Run product and verify label count and spacing after this action."
+        },
+        {
+          "check": "Does issue occur at specific speeds?",
+          "actions": ["Inspect Feed Timing", "Move Sensor Position"],
+          "validation": "Run product and verify label count and spacing after this action."
+        }
+      ],
+      "related_workflows_if_unresolved": ["label_has_stretch_lines"],
+      "escalation_conditions": [
+        "Issue continues after all checks and actions.",
+        "Multiple issues are occurring at the same time.",
+        "Mechanical damage or worn parts are observed.",
+        "Replacement parts are required."
+      ]
+    }
+  ]
+}
