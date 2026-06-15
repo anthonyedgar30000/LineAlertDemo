@@ -40,7 +40,13 @@ from linealert.situation.assessment import build_situation_assessment  # noqa: E
 from linealert.topology.report import attach_topology_context_to_evidence, generate_topology_report  # noqa: E402
 from linealert.topology.topology import load_topology  # noqa: E402
 from linealert.workflows.engine import find_workflow  # noqa: E402
+from linealert.workflows.evidence_filter import review_workflow_evidence  # noqa: E402
 from linealert.workflows.loader import load_decision_tree_workflows  # noqa: E402
+from linealert.workflows.prioritization import prioritize_workflow  # noqa: E402
+from linealert.workflows.priority_report import (  # noqa: E402
+    format_priority_report,
+    generate_priority_report,
+)
 from simulator.plc_simulator import FaultMode, PLCSimulator, SimulatorConfig  # noqa: E402
 from validation.baseline import generate_baseline, load_relationships  # noqa: E402
 
@@ -59,13 +65,29 @@ def main() -> None:
     REPORT_DIR.mkdir(parents=True, exist_ok=True)
     text_path = REPORT_DIR / "demo_report.txt"
     json_path = REPORT_DIR / "demo_report.json"
+    priority_text_path = REPORT_DIR / "workflow_prioritization_report.txt"
+    priority_json_path = REPORT_DIR / "workflow_prioritization_report.json"
     text_path.write_text(report["text_report"], encoding="utf-8")
     json_path.write_text(
         json.dumps(report["json_report"], indent=2) + "\n",
         encoding="utf-8",
     )
+    priority_text_path.write_text(
+        report["json_report"]["workflow_prioritization_text"],
+        encoding="utf-8",
+    )
+    priority_json_path.write_text(
+        json.dumps(report["json_report"]["workflow_prioritization"], indent=2) + "\n",
+        encoding="utf-8",
+    )
     print(report["text_report"])
-    print(f"\nReports written to:\n- {text_path}\n- {json_path}")
+    print(
+        "\nReports written to:"
+        f"\n- {text_path}"
+        f"\n- {json_path}"
+        f"\n- {priority_text_path}"
+        f"\n- {priority_json_path}"
+    )
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -73,7 +95,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--scenario",
         default="SlowTamp",
-        choices=[mode.value for mode in FaultMode],
+        choices=[mode.value for mode in FaultMode] + ["SlowTamp_Prioritized"],
         help="Simulator scenario for production cycles.",
     )
     parser.add_argument(
@@ -96,7 +118,8 @@ def run_demo(scenario: str, cycles: int) -> dict[str, object]:
     baseline_events = _events_for_scenario(FaultMode.NORMAL, cycle_count=20)
     baseline = generate_baseline(events=baseline_events, relationships=relationships)
 
-    production_events = _events_for_scenario(FaultMode(scenario), cycle_count=cycles)
+    fault_mode = _fault_mode_for_demo_scenario(scenario)
+    production_events = _events_for_scenario(fault_mode, cycle_count=cycles)
     production_cycles = build_cycles(
         events=production_events,
         relationships=relationships,
@@ -176,9 +199,29 @@ def run_demo(scenario: str, cycles: int) -> dict[str, object]:
         configuration_drift_present=False,
     )
 
-    workflow_result = find_workflow(
-        load_decision_tree_workflows(WORKFLOW_CONFIG),
-        "Bubbles",
+    workflows = load_decision_tree_workflows(WORKFLOW_CONFIG)
+    workflow_result = find_workflow(workflows, "Bubbles")
+    assert workflow_result.matched_workflow is not None
+    priority_evidence_review = review_workflow_evidence(
+        observed_condition="Tamp Extension Lag exceeded baseline",
+        evidence_summary=fusion_report,
+        relationship_integrity=generate_relationship_integrity_report(relationship_report),
+        dependency_chains=generate_dependency_chain_report(
+            graph=dependency_graph,
+            validation_report=dependency_report,
+        ),
+        topology_validation=topology_report,
+        confidence_summary=confidence.as_dict(),
+    )
+    related_workflows = [
+        workflow
+        for workflow in workflows
+        if workflow.workflow_id in {"multiple_labels_applying", "label_has_stretch_lines"}
+    ]
+    workflow_prioritization = prioritize_workflow(
+        workflow=workflow_result.matched_workflow,
+        evidence_review=priority_evidence_review,
+        related_workflows=related_workflows,
     )
     situation = build_situation_assessment(
         topology_aware_evidence_records=topology_aware_evidence,
@@ -205,6 +248,8 @@ def run_demo(scenario: str, cycles: int) -> dict[str, object]:
         "historical_context": history_report,
         "confidence_summary": confidence.as_dict(),
         "matched_workflow": _workflow_summary(workflow_result),
+        "workflow_prioritization": generate_priority_report(workflow_prioritization),
+        "workflow_prioritization_text": format_priority_report(workflow_prioritization),
         "situation_assessment": situation.as_dict(),
     }
     text_report = format_demo_report(report_data)
@@ -225,6 +270,12 @@ def _events_for_scenario(fault_mode: FaultMode, cycle_count: int):
         ),
         cycle_count=cycle_count,
     ).read_events()
+
+
+def _fault_mode_for_demo_scenario(scenario: str) -> FaultMode:
+    if scenario == "SlowTamp_Prioritized":
+        return FaultMode.SLOW_TAMP
+    return FaultMode(scenario)
 
 
 def _topology_aware_evidence(cycles, relationships, topology) -> list[dict[str, object]]:
@@ -402,6 +453,7 @@ def format_demo_report(report: dict[str, object]) -> str:
     history = report["historical_context"]
     confidence = report["confidence_summary"]
     workflow = report["matched_workflow"]
+    workflow_prioritization = report["workflow_prioritization"]
     situation = report["situation_assessment"]
     affected_component = (
         situation["affected_components"][0]
@@ -474,8 +526,45 @@ def format_demo_report(report: dict[str, object]) -> str:
         "Matched Workflow:",
         str(workflow["display_name"]),
         "",
+        "WORKFLOW ASSESSMENT",
+        "",
+        "Supported By Evidence",
+        *[f"- {item}" for item in workflow_prioritization["supported_by_evidence"]],
+        "",
+        "Not Supported By Evidence",
+        *[f"- {item}" for item in workflow_prioritization["not_supported_by_evidence"]],
+        "",
+        "Workflow Prioritization",
+        "",
+        "CHECK FIRST",
+        *[
+            f"{index}. {item['label']}\n   Reason: {item['reason']}"
+            for index, item in enumerate(workflow_prioritization["check_first"], start=1)
+        ],
+        "",
+        "CHECK SECOND",
+        *[
+            f"{index}. {item['label']}\n   Reason: {item['reason']}"
+            for index, item in enumerate(
+                workflow_prioritization["check_second"],
+                start=len(workflow_prioritization["check_first"]) + 1,
+            )
+        ],
+        "",
+        "DEFERRED",
+        *[
+            f"- {item['label']}\n  Reason: {item['reason']}"
+            for item in workflow_prioritization["deferred"]
+        ],
+        "",
+        "RULED OUT",
+        *[
+            f"- {item['label']}\n  Reason: {item['reason']}"
+            for item in workflow_prioritization["ruled_out"]
+        ],
+        "",
         "Suggested Guide Steps:",
-        *[f"- {step}" for step in workflow["guide_steps"]],
+        *[f"- {item['label']}" for item in workflow_prioritization["check_first"]],
         "",
         "Validation:",
         str(workflow["validation"]),
@@ -486,9 +575,8 @@ def format_demo_report(report: dict[str, object]) -> str:
         f"- Confidence: {situation['confidence']:.3f}",
         "",
         "Important:",
-        "- No diagnosis generated.",
-        "- No root cause claimed.",
-        "- No AI reasoning added.",
+        "- Deterministic evidence routing only.",
+        "- Existing evidence boundaries preserved.",
         "- Existing engine logic was not modified.",
         "",
     ]

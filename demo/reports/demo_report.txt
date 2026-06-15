@@ -1,7 +1,7 @@
 LINEALERT DEMO REPORT
 
 Scenario:
-SlowTamp
+SlowTamp_Prioritized
 
 Machine State:
 Production
@@ -67,11 +67,45 @@ Tamp Cylinder
 Matched Workflow:
 Bubbles on Labels / Tamp Delay Workflow
 
+WORKFLOW ASSESSMENT
+
+Supported By Evidence
+- Baseline Analysis: Tamp Extension Lag exceeded baseline
+- Relationship Integrity: required relationships observed in order
+- Dependency Chain: configured dependency path observed
+- Topology Integrity: topology validation passed
+- Confidence Engine: Very High confidence
+
+Not Supported By Evidence
+- No gap detection observations present
+- No spacing anomalies observed
+- No multiple-label observations present
+
+Workflow Prioritization
+
+CHECK FIRST
+1. Enough pressure time?
+   Reason: Observed condition directly relates to tamp delay
+2. Is bottle stable?
+   Reason: Observed condition directly relates to tamp delay
+
+CHECK SECOND
+3. Is contact pressure consistent?
+   Reason: Guide step may affect observed timing but is not the primary evidence match
+4. Does slowing machine help?
+   Reason: Guide step may affect observed timing but is not the primary evidence match
+
+DEFERRED
+- Label Has Stretch Lines workflow
+  Reason: No direct supporting evidence observed for this workflow branch
+
+RULED OUT
+- Multiple Labels Applying workflow
+  Reason: No multiple-label observations present
+
 Suggested Guide Steps:
 - Enough pressure time?
-- Increase Aligner Run-On
-- Increase Bottle Pressure
-- Decrease Label Speed
+- Is bottle stable?
 
 Validation:
 Run additional cycles and verify lag returns within baseline.
@@ -82,7 +116,6 @@ Final Situation Assessment:
 - Confidence: 0.950
 
 Important:
-- No diagnosis generated.
-- No root cause claimed.
-- No AI reasoning added.
+- Deterministic evidence routing only.
+- Existing evidence boundaries preserved.
 - Existing engine logic was not modified.

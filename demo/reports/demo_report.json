@@ -1,5 +1,5 @@
 {
-  "scenario": "SlowTamp",
+  "scenario": "SlowTamp_Prioritized",
   "machine_state": "Production",
   "event_timeline": "Cycle 1\n\n00.000 CycleStart\n01.100 ProductDetected\n02.200 PrintComplete\n03.000 TampExtendCommand\n04.100 TampExtendedSensor\n04.800 TampHomeSensor\n05.300 CycleComplete",
   "cycle_summary": {
@@ -680,6 +680,86 @@
       "Unusual noises or air leaks are present."
     ]
   },
+  "workflow_prioritization": {
+    "workflow_id": "bubbles_on_labels",
+    "symptom": "Bubbles on Labels",
+    "observed_condition": "Tamp Extension Lag exceeded baseline",
+    "supported_by_evidence": [
+      "Baseline Analysis: Tamp Extension Lag exceeded baseline",
+      "Relationship Integrity: required relationships observed in order",
+      "Dependency Chain: configured dependency path observed",
+      "Topology Integrity: topology validation passed",
+      "Confidence Engine: Very High confidence"
+    ],
+    "not_supported_by_evidence": [
+      "No gap detection observations present",
+      "No spacing anomalies observed",
+      "No multiple-label observations present"
+    ],
+    "check_first": [
+      {
+        "label": "Enough pressure time?",
+        "decision": "CHECK FIRST",
+        "reason": "Observed condition directly relates to tamp delay",
+        "original_index": 1,
+        "check": "Enough pressure time?",
+        "actions": [
+          "Increase Aligner Run-On"
+        ],
+        "validation": "Run product and verify label adhesion after this action."
+      },
+      {
+        "label": "Is bottle stable?",
+        "decision": "CHECK FIRST",
+        "reason": "Observed condition directly relates to tamp delay",
+        "original_index": 2,
+        "check": "Is bottle stable?",
+        "actions": [
+          "Increase Bottle Pressure"
+        ],
+        "validation": "Run product and verify label adhesion after this action."
+      }
+    ],
+    "check_second": [
+      {
+        "label": "Is contact pressure consistent?",
+        "decision": "CHECK SECOND",
+        "reason": "Guide step may affect observed timing but is not the primary evidence match",
+        "original_index": 3,
+        "check": "Is contact pressure consistent?",
+        "actions": [
+          "Inspect Contact / Wipe Pressure"
+        ],
+        "validation": "Run product and verify label adhesion after this action."
+      },
+      {
+        "label": "Does slowing machine help?",
+        "decision": "CHECK SECOND",
+        "reason": "Guide step may affect observed timing but is not the primary evidence match",
+        "original_index": 4,
+        "check": "Does slowing machine help?",
+        "actions": [
+          "Decrease Label Speed"
+        ],
+        "validation": "Run product and verify label adhesion after this action."
+      }
+    ],
+    "deferred": [
+      {
+        "label": "Label Has Stretch Lines workflow",
+        "decision": "DEFERRED",
+        "reason": "No direct supporting evidence observed for this workflow branch"
+      }
+    ],
+    "ruled_out": [
+      {
+        "label": "Multiple Labels Applying workflow",
+        "decision": "RULED OUT",
+        "reason": "No multiple-label observations present"
+      }
+    ]
+  },
+  "workflow_prioritization_text": "WORKFLOW ASSESSMENT\n\nObserved Condition:\nTamp Extension Lag exceeded baseline\n\nSupported By Evidence\n- Baseline Analysis: Tamp Extension Lag exceeded baseline\n- Relationship Integrity: required relationships observed in order\n- Dependency Chain: configured dependency path observed\n- Topology Integrity: topology validation passed\n- Confidence Engine: Very High confidence\n\nNot Supported By Evidence\n- No gap detection observations present\n- No spacing anomalies observed\n- No multiple-label observations present\n\nWorkflow Prioritization\n\nCHECK FIRST\n1. Enough pressure time?\n   Reason: Observed condition directly relates to tamp delay\n   Action Step: Increase Aligner Run-On\n2. Is bottle stable?\n   Reason: Observed condition directly relates to tamp delay\n   Action Step: Increase Bottle Pressure\n\nCHECK SECOND\n3. Is contact pressure consistent?\n   Reason: Guide step may affect observed timing but is not the primary evidence match\n   Action Step: Inspect Contact / Wipe Pressure\n4. Does slowing machine help?\n   Reason: Guide step may affect observed timing but is not the primary evidence match\n   Action Step: Decrease Label Speed\n\nDEFERRED\n- Label Has Stretch Lines workflow\n  Reason: No direct supporting evidence observed for this workflow branch\n\nRULED OUT\n- Multiple Labels Applying workflow\n  Reason: No multiple-label observations present\n\nDeterministic workflow routing only.\nExisting evidence boundaries preserved.\n",
   "situation_assessment": {
     "assessment_id": "demo-linealert-situation-assessment",
     "machine_state": "Production",
