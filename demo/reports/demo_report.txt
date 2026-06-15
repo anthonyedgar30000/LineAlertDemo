@@ -1,0 +1,88 @@
+LINEALERT DEMO REPORT
+
+Scenario:
+SlowTamp
+
+Machine State:
+Production
+
+Observed Condition:
+Tamp Extension Lag exceeded baseline
+
+Baseline:
+600 ms
+
+Observed:
+1100 ms
+
+Deviation:
+83.3%
+
+Cycles Observed:
+12
+
+Cycles Affected:
+12
+
+Event Timeline:
+Cycle 1
+
+00.000 CycleStart
+01.100 ProductDetected
+02.200 PrintComplete
+03.000 TampExtendCommand
+04.100 TampExtendedSensor
+04.800 TampHomeSensor
+05.300 CycleComplete
+
+Cycle Summary:
+- Average duration: 5300 ms
+- Affected cycle IDs: 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12
+
+Evidence Sources:
+- Baseline Analysis
+- Dependency Chain
+- Relationship Integrity
+- Topology Integrity
+- Historical Context
+- Confidence Engine
+
+Evidence Summary:
+- Evidence density: 15 observations
+- Sources contributing: 4
+- Observation clusters: Dependency Chain, Relationship Integrity, Tamp Operation Deviation, Topology Integrity
+
+Historical Context:
+- Occurrences: 12
+- Persistence: 12 consecutive cycles
+- Evidence density trend: Flat
+
+Confidence:
+Very High
+Score: 1.000
+
+Affected Component:
+Tamp Cylinder
+
+Matched Workflow:
+Bubbles on Labels / Tamp Delay Workflow
+
+Suggested Guide Steps:
+- Enough pressure time?
+- Increase Aligner Run-On
+- Increase Bottle Pressure
+- Decrease Label Speed
+
+Validation:
+Run additional cycles and verify lag returns within baseline.
+
+Final Situation Assessment:
+- Status: Significant Deviation
+- Topology integrity: Valid
+- Confidence: 0.950
+
+Important:
+- No diagnosis generated.
+- No root cause claimed.
+- No AI reasoning added.
+- Existing engine logic was not modified.
